@@ -7,7 +7,7 @@ import { redact } from './util/redact.js';
 import type { CanUseTool, QueryFn } from './sdk/types.js';
 
 export interface RunOnceConfig {
-  apiKey: string;
+  apiKey?: string;
   model?: string;
   cwd?: string;
   queryFn?: QueryFn; // injectable for tests

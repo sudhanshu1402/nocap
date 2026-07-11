@@ -49,7 +49,7 @@ function sessionMessagesToEntries(messages: SessionMessage[]): ChatEntry[] {
 }
 
 export interface AppProps {
-  apiKey: string;
+  apiKey?: string;
   model?: string;
   cwd?: string;
   queryFn?: QueryFn; // injectable for tests — omit to use the real SDK

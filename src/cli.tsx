@@ -4,6 +4,7 @@ import { render } from 'ink';
 import { App } from './ui/App.js';
 import { runOnce } from './once.js';
 import { resolveApiKey } from './config/apiKey.js';
+import { hasClaudeCliAuth } from './config/claudeAuth.js';
 import { readConfig, writeConfig } from './config/config.js';
 import { Wizard, type WizardResult } from './wizard/setup.js';
 import { redact } from './util/redact.js';
@@ -42,10 +43,13 @@ async function main(): Promise<void> {
   let model = readConfig().model;
   const onceIndex = args.indexOf('--once');
 
-  if (!apiKey) {
+  // No explicit key needed when `claude` is already logged in on this
+  // machine — the SDK's subprocess picks that auth up on its own as long as
+  // we don't force ANTHROPIC_API_KEY (see sdk/options.ts).
+  if (!apiKey && !hasClaudeCliAuth()) {
     if (onceIndex !== -1 || !process.stdin.isTTY) {
-      console.error('No API key found. Set ANTHROPIC_API_KEY and try again.');
-      console.error('(the guided first-run setup only runs in an interactive terminal)');
+      console.error('No API key found and no `claude` CLI login detected.');
+      console.error('Run `claude` to log in, or set ANTHROPIC_API_KEY, and try again.');
       process.exitCode = 1;
       return;
     }

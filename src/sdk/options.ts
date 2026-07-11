@@ -23,7 +23,7 @@ export function isAutoAllowedReadOnly(toolName: string): boolean {
 }
 
 export interface SessionConfig {
-  apiKey: string;
+  apiKey?: string;
   model?: string;
   cwd?: string;
   permissionMode?: PermissionMode;
@@ -49,7 +49,10 @@ export function buildOptions(config: SessionConfig): Options {
     resume: config.resume,
     // `env` REPLACES process.env wholesale (per SDK docs) — spread it or the
     // subprocess loses PATH/HOME/nvm-managed node and silently misbehaves.
-    env: { ...process.env, ANTHROPIC_API_KEY: config.apiKey },
+    // No apiKey means the user is relying on an existing `claude` CLI login
+    // (see config/claudeAuth.ts) — leave env untouched so the SDK's own
+    // subprocess resolves that auth itself instead of us forcing a key.
+    env: config.apiKey ? { ...process.env, ANTHROPIC_API_KEY: config.apiKey } : process.env,
     stderr: config.onStderr,
   };
 }

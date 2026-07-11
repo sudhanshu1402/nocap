@@ -48,7 +48,7 @@ jobs:
         id: check
         run: |
           LOCAL_VERSION=$(node -p "require('./package.json').version")
-          PUBLISHED_VERSION=$(npm view nocap version 2>/dev/null || echo "0.0.0")
+          PUBLISHED_VERSION=$(npm view @sudhanshu1402/nocap version 2>/dev/null || echo "0.0.0")
           if [ "$LOCAL_VERSION" != "$PUBLISHED_VERSION" ]; then
             echo "should_publish=true" >> "$GITHUB_OUTPUT"
           else

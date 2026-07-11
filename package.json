@@ -1,5 +1,5 @@
 {
-  "name": "nocap",
+  "name": "@sudhanshu1402/nocap",
   "version": "0.1.0",
   "description": "no cap, no jargon — a plain-English terminal UI for the Claude Agent SDK",
   "keywords": ["claude", "claude-code", "agent", "cli", "terminal", "ink", "ai"],

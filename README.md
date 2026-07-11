@@ -10,7 +10,7 @@ readable feed of what Claude is doing and a clear Yes/No card before anything ri
 ## Quickstart (2 minutes)
 
 ```
-npx nocap
+npx @sudhanshu1402/nocap
 ```
 
 That's it. First time you run it, a short setup wizard walks you through:
@@ -28,7 +28,7 @@ After that, just type what you want done, like you would to a person.
 To install it permanently instead of using `npx` each time:
 
 ```
-npm install -g nocap
+npm install -g @sudhanshu1402/nocap
 nocap
 ```
 
@@ -65,8 +65,8 @@ For a single non-interactive turn (no terminal UI):
 nocap --once "list the files in this repo"
 ```
 
-Requires `ANTHROPIC_API_KEY` in the environment — the wizard only runs in an interactive
-terminal.
+Requires either `ANTHROPIC_API_KEY` in the environment or an existing `claude` CLI login —
+the wizard only runs in an interactive terminal.
 
 ## Safety
 

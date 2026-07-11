@@ -1,0 +1,46 @@
+{
+  "name": "nocap",
+  "version": "0.1.0",
+  "description": "no cap, no jargon — a plain-English terminal UI for the Claude Agent SDK",
+  "keywords": ["claude", "claude-code", "agent", "cli", "terminal", "ink", "ai"],
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "nocap": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && chmod +x dist/cli.js",
+    "dev": "tsx src/cli.tsx",
+    "lint": "eslint src test",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build && npm run test && npm run lint"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "0.3.207",
+    "@anthropic-ai/sdk": "^0.111.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "ink": "7.1.0",
+    "react": "19.2.7",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.2.0",
+    "eslint": "^10.7.0",
+    "tsx": "^4.19.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.18.0",
+    "vitest": "^4.1.10"
+  }
+}

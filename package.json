@@ -4,6 +4,14 @@
   "description": "no cap, no jargon — a plain-English terminal UI for the Claude Agent SDK",
   "keywords": ["claude", "claude-code", "agent", "cli", "terminal", "ink", "ai"],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sudhanshu1402/nocap.git"
+  },
+  "homepage": "https://github.com/sudhanshu1402/nocap#readme",
+  "bugs": {
+    "url": "https://github.com/sudhanshu1402/nocap/issues"
+  },
   "type": "module",
   "bin": {
     "nocap": "dist/cli.js"

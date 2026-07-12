@@ -11,7 +11,7 @@ import { estimateCost, type TokenUsage } from '../cost/costMeter.js';
 import { CheckpointTracker, restoreGitSnapshot } from '../checkpoint/checkpoints.js';
 import { getSessionMessages, listRecentSessions } from '../history/sessions.js';
 import { redact } from '../util/redact.js';
-import { pluralize } from '../util/format.js';
+import { isSlashCommand, pluralize } from '../util/format.js';
 import { Layout } from './Layout.js';
 import { ApprovalCard } from './ApprovalCard.js';
 import { HistoryBrowser } from './HistoryBrowser.js';
@@ -48,10 +48,34 @@ function sessionMessagesToEntries(messages: SessionMessage[]): ChatEntry[] {
   return entries;
 }
 
+type SetEntries = React.Dispatch<React.SetStateAction<ChatEntry[]>>;
+
+// Shared by the launch-time resume effect and Ctrl+H's handleResumeSession —
+// `isStale` lets a caller abandon its own result once a newer resume has
+// superseded it (see resumeGenerationRef in App).
+async function loadPastTranscript(sessionId: string, cwd: string, setEntries: SetEntries, isStale: () => boolean): Promise<void> {
+  try {
+    const messages = await getSessionMessages(sessionId, { cwd });
+    if (isStale()) return;
+    const restored = sessionMessagesToEntries(messages);
+    if (restored.length > 0) {
+      setEntries((prev) => [...prev, ...restored]);
+    }
+  } catch (err) {
+    if (isStale()) return;
+    setEntries((prev) => [
+      ...prev,
+      { id: `resume-error-${sessionId}`, role: 'system', text: `⚠ couldn't load past transcript: ${redact(err instanceof Error ? err.message : String(err))}` },
+    ]);
+  }
+}
+
 export interface AppProps {
   apiKey?: string;
   model?: string;
   cwd?: string;
+  resumeSessionId?: string; // set by --continue/--resume to resume on launch
+  resumeNotice?: string; // e.g. "no past session found" — shown in-transcript since stderr is hidden once the alt-screen takes over
   queryFn?: QueryFn; // injectable for tests — omit to use the real SDK
   onEntriesChange?: (entries: ChatEntry[]) => void;
 }
@@ -80,7 +104,11 @@ export function App(props: AppProps): React.JSX.Element {
   const checkpointTurnRef = useRef(0);
   const checkpointsRef = useRef(new CheckpointTracker());
   const gitSnapshotRef = useRef<Array<{ hash: string; createdAt: number }>>([]);
-  const resumeIdRef = useRef<string | undefined>(undefined);
+  const resumeIdRef = useRef<string | undefined>(props.resumeSessionId);
+  // Bumped by both the launch-time resume effect and handleResumeSession —
+  // whichever load started last wins; an earlier in-flight load checks this
+  // before applying its result and discards itself if it's been superseded.
+  const resumeGenerationRef = useRef(0);
 
   const approvalMachine = useMemo(() => new ApprovalMachine(), []);
   // sessionEpoch is bumped by handleResumeSession to force a fresh SdkSession
@@ -97,6 +125,25 @@ export function App(props: AppProps): React.JSX.Element {
     startedAtRef.current = Date.now();
     const id = setInterval(() => setTick(Date.now() - startedAtRef.current), 1000);
     return () => clearInterval(id);
+  }, []);
+
+  // Launched with --continue/--resume: preload the past transcript so the
+  // resumed conversation is visible right away, same as picking one from
+  // Ctrl+H. Mount-only — resumeSessionId is a launch-time value that never
+  // changes for the life of the process. Shares resumeGenerationRef with
+  // handleResumeSession so a Ctrl+H resume that lands first wins and this
+  // load's result is discarded instead of appending stale/duplicate entries.
+  useEffect(() => {
+    const sessionId = props.resumeSessionId;
+    if (!sessionId) {
+      if (props.resumeNotice) {
+        setEntries((prev) => [...prev, { id: 'resume-notice', role: 'system', text: props.resumeNotice as string }]);
+      }
+      return;
+    }
+    const myGeneration = ++resumeGenerationRef.current;
+    setEntries((prev) => [...prev, { id: `resume-${sessionId}`, role: 'system', text: `resuming session ${sessionId.slice(0, 8)}…` }]);
+    void loadPastTranscript(sessionId, cwd, setEntries, () => resumeGenerationRef.current !== myGeneration);
   }, []);
 
   useEffect(() => {
@@ -295,18 +342,8 @@ export function App(props: AppProps): React.JSX.Element {
     // for the whole transcript-load duration, and any message it receives
     // in that window lands on the freshly-reset state above.
     setSessionEpoch((epoch) => epoch + 1);
-    try {
-      const messages = await getSessionMessages(sessionId, { cwd });
-      const restored = sessionMessagesToEntries(messages);
-      if (restored.length > 0) {
-        setEntries((prev) => [...prev, ...restored]);
-      }
-    } catch (err) {
-      setEntries((prev) => [
-        ...prev,
-        { id: `resume-error-${sessionId}`, role: 'system', text: `⚠ couldn't load past transcript: ${redact(err instanceof Error ? err.message : String(err))}` },
-      ]);
-    }
+    const myGeneration = ++resumeGenerationRef.current;
+    await loadPastTranscript(sessionId, cwd, setEntries, () => resumeGenerationRef.current !== myGeneration);
   };
 
   // Reports a rejection into the transcript instead of letting it become an
@@ -359,6 +396,21 @@ export function App(props: AppProps): React.JSX.Element {
     msgCounterRef.current += 1;
     setEntries((prev) => [...prev, { id: `user-${msgCounterRef.current}`, role: 'user', text }]);
     setScrollOffset(0);
+    // Claude Code's slash commands (/mcp, /agents, /hooks, etc.) are handled
+    // by the real CLI's own REPL before a message is ever sent — nocap has no
+    // equivalent, so forwarding "/foo" would just confuse the model instead
+    // of doing anything. Say so plainly instead of sending it silently.
+    if (isSlashCommand(text)) {
+      setEntries((prev) => [
+        ...prev,
+        {
+          id: `slash-${msgCounterRef.current}`,
+          role: 'system',
+          text: "slash commands aren't supported in nocap yet — ask in plain English instead, or run `claude` directly for that command.",
+        },
+      ]);
+      return;
+    }
     setStatus('running');
     session.send(text);
   };

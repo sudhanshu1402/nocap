@@ -28,3 +28,13 @@ export function truncate(text: string, max = 60): string {
 export function pluralize(count: number, noun: string): string {
   return `${count} ${noun}${count === 1 ? '' : 's'}`;
 }
+
+// A real slash command's first token is a bare word ("mcp", "figma:use") —
+// file paths always carry a second '/' or a '.' extension in that same
+// token, so this narrows the match instead of flagging every leading slash.
+export function isSlashCommand(text: string): boolean {
+  const trimmed = text.trimStart();
+  if (!trimmed.startsWith('/')) return false;
+  const firstToken = trimmed.slice(1).split(/\s/)[0] ?? '';
+  return /^[a-zA-Z][a-zA-Z0-9_:-]*$/.test(firstToken);
+}

@@ -10,6 +10,7 @@ export interface RunOnceConfig {
   apiKey?: string;
   model?: string;
   cwd?: string;
+  resume?: string; // set by --continue/--resume so --once can also target a past session
   queryFn?: QueryFn; // injectable for tests
 }
 
@@ -82,6 +83,7 @@ export async function runOnce(prompt: string, config: RunOnceConfig): Promise<Ru
         cwd: config.cwd,
         canUseTool: headlessCanUseTool,
         permissionMode: 'default',
+        resume: config.resume,
       }),
     );
     session.send(prompt);

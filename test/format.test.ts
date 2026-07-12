@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { pluralize, shortenPath, truncate } from '../src/util/format.js';
+import { isSlashCommand, pluralize, shortenPath, truncate } from '../src/util/format.js';
 
 describe('shortenPath', () => {
   it('strips a matching cwd prefix', () => {
@@ -52,5 +52,35 @@ describe('pluralize', () => {
   it('pluralizes for 0 and for counts above 1', () => {
     expect(pluralize(0, 'change')).toBe('0 changes');
     expect(pluralize(3, 'change')).toBe('3 changes');
+  });
+});
+
+describe('isSlashCommand', () => {
+  it('flags text starting with /', () => {
+    expect(isSlashCommand('/mcp')).toBe(true);
+  });
+
+  it('flags leading whitespace before the slash', () => {
+    expect(isSlashCommand('  /agents')).toBe(true);
+  });
+
+  it('leaves plain chat text alone, even mid-sentence slashes', () => {
+    expect(isSlashCommand('check /etc/hosts for me')).toBe(false);
+  });
+
+  it('leaves empty input alone', () => {
+    expect(isSlashCommand('')).toBe(false);
+  });
+
+  it('leaves a leading absolute file path alone', () => {
+    expect(isSlashCommand('/Users/me/project/src/index.ts has a bug, fix it')).toBe(false);
+  });
+
+  it('leaves a leading multi-segment path alone even without an extension', () => {
+    expect(isSlashCommand('/etc/nginx/nginx.conf needs a new server block')).toBe(false);
+  });
+
+  it('flags a namespaced plugin command', () => {
+    expect(isSlashCommand('/figma:figma-use')).toBe(true);
   });
 });

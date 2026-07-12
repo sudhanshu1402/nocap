@@ -6,12 +6,52 @@ import { runOnce } from './once.js';
 import { resolveApiKey } from './config/apiKey.js';
 import { hasClaudeCliAuth } from './config/claudeAuth.js';
 import { readConfig, writeConfig } from './config/config.js';
+import { listRecentSessions } from './history/sessions.js';
 import { Wizard, type WizardResult } from './wizard/setup.js';
 import { redact } from './util/redact.js';
 import type { ChatEntry } from './ui/types.js';
 
 function printUsage(): void {
-  console.error('Usage: nocap [--once "<prompt>"]');
+  console.error('Usage: nocap [--once "<prompt>"] [--continue|-c] [--resume|-r [id]]');
+}
+
+interface ResumeResolution {
+  sessionId?: string;
+  // Set instead of printing directly — cli.tsx runs console.error too early
+  // to be seen once Ink's alternateScreen takes over, so the caller surfaces
+  // this in-transcript (App's resumeNotice prop) or, in --once mode, prints
+  // it itself where stderr is still visible for the whole run.
+  notice?: string;
+}
+
+// Mirrors claude's own -c/--continue and -r/--resume [id] so a `claude` ->
+// `nocap` alias doesn't silently drop the flag — falls back to the most
+// recent session for this folder when no explicit id is given.
+async function resolveResumeSessionId(args: string[], cwd: string): Promise<ResumeResolution> {
+  const equalsArg = args.find((a) => a.startsWith('--resume=') || a.startsWith('-r='));
+  if (equalsArg) {
+    const value = equalsArg.slice(equalsArg.indexOf('=') + 1);
+    if (value) return { sessionId: value };
+  }
+
+  const resumeIndex = args.findIndex((a) => a === '--resume' || a === '-r');
+  const continueRequested = args.includes('--continue') || args.includes('-c');
+  if (!continueRequested && resumeIndex === -1) return {};
+
+  if (resumeIndex !== -1) {
+    const next = args[resumeIndex + 1];
+    if (next && !next.startsWith('-')) return { sessionId: next };
+  }
+
+  try {
+    const [mostRecent] = await listRecentSessions({ cwd, limit: 1 });
+    if (!mostRecent) {
+      return { notice: 'No past session found in this folder — starting fresh.' };
+    }
+    return { sessionId: mostRecent.sessionId };
+  } catch (err) {
+    return { notice: `couldn't read past sessions — starting fresh (${redact(err instanceof Error ? err.message : String(err))})` };
+  }
 }
 
 function printTranscript(entries: ChatEntry[]): void {
@@ -61,15 +101,20 @@ async function main(): Promise<void> {
     }
   }
 
+  const resumeResolution = await resolveResumeSessionId(args, process.cwd());
+
   if (onceIndex !== -1) {
     const prompt = args[onceIndex + 1];
-    if (!prompt) {
+    if (!prompt || prompt.startsWith('-')) {
       printUsage();
       process.exitCode = 1;
       return;
     }
+    if (resumeResolution.notice) {
+      console.error(resumeResolution.notice);
+    }
     try {
-      const result = await runOnce(prompt, { apiKey, model });
+      const result = await runOnce(prompt, { apiKey, model, resume: resumeResolution.sessionId });
       process.exitCode = result.ok ? 0 : 1;
     } catch (err) {
       console.error(redact(err instanceof Error ? err.message : String(err)));
@@ -80,7 +125,13 @@ async function main(): Promise<void> {
 
   let latestEntries: ChatEntry[] = [];
   const instance = render(
-    <App apiKey={apiKey} model={model} onEntriesChange={(entries) => { latestEntries = entries; }} />,
+    <App
+      apiKey={apiKey}
+      model={model}
+      resumeSessionId={resumeResolution.sessionId}
+      resumeNotice={resumeResolution.notice}
+      onEntriesChange={(entries) => { latestEntries = entries; }}
+    />,
     {
       alternateScreen: true,
       interactive: true,

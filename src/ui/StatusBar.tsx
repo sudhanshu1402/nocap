@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Text } from 'ink';
 import { colors, ruleBorder } from './theme.js';
 import type { PermissionMode } from '../sdk/types.js';
@@ -10,7 +10,10 @@ interface Props {
   elapsedMs: number;
   costUsd?: number;
   status: SessionStatus;
+  contextPercent?: number;
 }
+
+const SPINNER_FRAMES = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
 
 const MODE_LABEL: Record<PermissionMode, string> = {
   default: 'ask before risky actions',
@@ -30,7 +33,15 @@ function formatElapsed(ms: number): string {
 
 const DIVIDER = '   │   ';
 
-export function StatusBar({ model, permissionMode, elapsedMs, costUsd, status }: Props): React.JSX.Element {
+export function StatusBar({ model, permissionMode, elapsedMs, costUsd, status, contextPercent }: Props): React.JSX.Element {
+  const [spinnerFrame, setSpinnerFrame] = useState(0);
+  // Ticks only while a turn is in flight — fast enough to read as motion, unlike the 1s elapsed clock.
+  useEffect(() => {
+    if (status !== 'running') return;
+    const id = setInterval(() => setSpinnerFrame((frame) => frame + 1), 100);
+    return () => clearInterval(id);
+  }, [status]);
+
   return (
     <Box {...ruleBorder('top')} paddingX={1} justifyContent="space-between">
       <Text>
@@ -43,13 +54,19 @@ export function StatusBar({ model, permissionMode, elapsedMs, costUsd, status }:
       <Text>
         {status === 'running' && (
           <Text color={colors.accent}>
-            ● working
+            {SPINNER_FRAMES[spinnerFrame % SPINNER_FRAMES.length]} working
             <Text color={colors.border}>{DIVIDER}</Text>
           </Text>
         )}
         {status === 'error' && (
           <Text color={colors.danger}>
             ⚠ error
+            <Text color={colors.border}>{DIVIDER}</Text>
+          </Text>
+        )}
+        {typeof contextPercent === 'number' && (
+          <Text color={colors.dim}>
+            {`${contextPercent}% context`}
             <Text color={colors.border}>{DIVIDER}</Text>
           </Text>
         )}

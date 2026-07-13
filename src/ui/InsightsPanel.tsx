@@ -16,14 +16,14 @@ export function InsightsPanel({ lines, maxVisible }: Props): React.JSX.Element {
       <Text bold color={colors.accent}>
         insights
       </Text>
-      {visible.length === 0 && (
-        <Text color={colors.dim} dimColor>
-          nothing yet
-        </Text>
-      )}
       {visible.map((line, index) => (
         <Text key={`${line.id}-${index}`} color={colors.risk[line.risk]}>
           › {line.text}
+          {line.count && line.count > 1 && (
+            <Text color={colors.dim} dimColor>
+              {` ×${line.count}`}
+            </Text>
+          )}
         </Text>
       ))}
     </Box>

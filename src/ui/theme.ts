@@ -7,7 +7,7 @@ export const colors = {
   },
   role: {
     user: '#e8e6df',
-    assistant: '#a8a49c',
+    assistant: '#6f9dc0',
     system: '#6b6f76',
   },
   accent: '#d99a4e',

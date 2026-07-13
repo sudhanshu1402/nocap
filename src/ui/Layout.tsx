@@ -20,6 +20,7 @@ interface Props {
   elapsedMs: number;
   costUsd?: number;
   status: SessionStatus;
+  contextPercent?: number;
   scrollOffset: number;
   bottom: React.ReactNode; // ApprovalCard when pending, else PromptInput
 }
@@ -28,12 +29,13 @@ export function Layout(props: Props): React.JSX.Element {
   const { columns, rows } = useWindowSize();
   const isWide = columns >= WIDE_BREAKPOINT;
   const bodyRows = Math.max(3, rows - RESERVED_ROWS);
+  const hasInsights = props.insights.length > 0;
 
   const transcript = (
     <Transcript
       entries={props.entries}
       streamingText={props.streamingText}
-      maxVisible={isWide ? bodyRows : Math.max(2, Math.floor(bodyRows * 0.6))}
+      maxVisible={isWide || !hasInsights ? bodyRows : Math.max(2, Math.floor(bodyRows * 0.6))}
       scrollOffset={props.scrollOffset}
     />
   );
@@ -48,19 +50,23 @@ export function Layout(props: Props): React.JSX.Element {
     <Box flexDirection="column" width={columns} height={rows}>
       {isWide ? (
         <Box flexDirection="row" flexGrow={1}>
-          <Box flexGrow={1} flexBasis="70%" marginRight={1}>
+          <Box flexGrow={1} flexBasis={hasInsights ? '70%' : '100%'} marginRight={hasInsights ? 1 : 0}>
             {transcript}
           </Box>
-          <Box flexBasis="30%" {...ruleBorder('left')} paddingX={1}>
-            {insights}
-          </Box>
+          {hasInsights && (
+            <Box flexBasis="30%" {...ruleBorder('left')} paddingX={1}>
+              {insights}
+            </Box>
+          )}
         </Box>
       ) : (
         <Box flexDirection="column" flexGrow={1}>
           {transcript}
-          <Box {...ruleBorder('top')} paddingX={1}>
-            {insights}
-          </Box>
+          {hasInsights && (
+            <Box {...ruleBorder('top')} paddingX={1}>
+              {insights}
+            </Box>
+          )}
         </Box>
       )}
       <StatusBar
@@ -69,6 +75,7 @@ export function Layout(props: Props): React.JSX.Element {
         elapsedMs={props.elapsedMs}
         costUsd={props.costUsd}
         status={props.status}
+        contextPercent={props.contextPercent}
       />
       {props.bottom}
     </Box>

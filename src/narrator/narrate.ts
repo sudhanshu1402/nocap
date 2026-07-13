@@ -7,6 +7,7 @@ export interface InsightLine {
   toolName: string;
   text: string;
   risk: RiskLevel;
+  count?: number; // >1 when the UI has collapsed consecutive identical calls
 }
 
 /**

@@ -1,6 +1,8 @@
 import React from 'react';
 import { Box, Text, useInput } from 'ink';
-import { colors } from './theme.js';
+import { colors, ruleBorder } from './theme.js';
+import { redact } from '../util/redact.js';
+import { pluralize, shortenPath, truncate } from '../util/format.js';
 import type { ApprovalRequest } from '../permission/approvalMachine.js';
 
 interface Props {
@@ -8,6 +10,39 @@ interface Props {
   queuedCount: number; // requests waiting behind this one
   onApprove: (remember: boolean) => void;
   onDeny: () => void;
+}
+
+function str(v: unknown): string {
+  return typeof v === 'string' ? v : '';
+}
+
+// Redact before truncate — truncating first can cut a secret mid-string and let the tail slip past the redact regex.
+function formatPreview(toolName: string, input: Record<string, unknown>): string | undefined {
+  switch (toolName) {
+    case 'Bash': {
+      const command = str(input.command);
+      return command ? truncate(redact(command), 200) : undefined;
+    }
+    case 'Write': {
+      const filePath = shortenPath(str(input.file_path));
+      const content = str(input.content);
+      return content ? `${filePath}\n${truncate(redact(content), 200)}` : filePath || undefined;
+    }
+    case 'Edit': {
+      const filePath = shortenPath(str(input.file_path));
+      const diff = `${truncate(redact(str(input.old_string)), 80)} → ${truncate(redact(str(input.new_string)), 80)}`;
+      return filePath ? `${filePath}\n${diff}` : diff;
+    }
+    case 'MultiEdit': {
+      const filePath = shortenPath(str(input.file_path));
+      const edits = Array.isArray(input.edits) ? input.edits.length : 0;
+      return `${filePath} — ${pluralize(edits, 'edit')}`;
+    }
+    default: {
+      const summary = truncate(redact(JSON.stringify(input)), 150);
+      return summary && summary !== '{}' ? summary : undefined;
+    }
+  }
 }
 
 /**
@@ -25,6 +60,7 @@ export function ApprovalCard({ request, queuedCount, onApprove, onDeny }: Props)
 
   const headline = request.title ?? `Claude wants to use ${request.displayName ?? request.toolName}`;
   const subtitle = request.description ?? request.risk.reason;
+  const preview = formatPreview(request.toolName, request.input);
 
   return (
     <Box flexDirection="column" borderStyle="round" borderColor={colors.risk[request.risk.level]} paddingX={1}>
@@ -36,6 +72,13 @@ export function ApprovalCard({ request, queuedCount, onApprove, onDeny }: Props)
         <Text color={colors.dim} dimColor>
           {subtitle}
         </Text>
+      )}
+      {preview && (
+        <Box {...ruleBorder('left')} paddingLeft={1}>
+          <Text color={colors.dim} dimColor>
+            {preview}
+          </Text>
+        </Box>
       )}
       {request.risk.saferAlternative && (
         <Text color={colors.dim} dimColor>

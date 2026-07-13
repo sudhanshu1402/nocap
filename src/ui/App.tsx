@@ -98,6 +98,7 @@ export function App(props: AppProps): React.JSX.Element {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [sessions, setSessions] = useState<SDKSessionInfo[]>([]);
   const [sessionEpoch, setSessionEpoch] = useState(0);
+  const [contextUsage, setContextUsage] = useState<{ used: number; window: number } | undefined>(undefined);
 
   const startedAtRef = useRef(0);
   const msgCounterRef = useRef(0);
@@ -105,6 +106,11 @@ export function App(props: AppProps): React.JSX.Element {
   const checkpointsRef = useRef(new CheckpointTracker());
   const gitSnapshotRef = useRef<Array<{ hash: string; createdAt: number }>>([]);
   const resumeIdRef = useRef<string | undefined>(props.resumeSessionId);
+  const modelRef = useRef<string | undefined>(undefined); // mirrors `model` state without the effect's stale closure
+  // Refs, not state — driven only via the setDraft() they trigger.
+  const sentHistoryRef = useRef<string[]>([]);
+  const historyIndexRef = useRef<number | null>(null); // null = live draft, not recalling
+  const stashedDraftRef = useRef('');
   // Bumped by both the launch-time resume effect and handleResumeSession —
   // whichever load started last wins; an earlier in-flight load checks this
   // before applying its result and discards itself if it's been superseded.
@@ -166,6 +172,7 @@ export function App(props: AppProps): React.JSX.Element {
         case 'system': {
           if (msg.subtype === 'init') {
             setModel(msg.model);
+            modelRef.current = msg.model;
             setPermissionMode(msg.permissionMode);
           } else if (msg.subtype === 'permission_denied') {
             setEntries((prev) => [
@@ -200,7 +207,14 @@ export function App(props: AppProps): React.JSX.Element {
               text += block.text;
             } else if (isToolUseBlock(block)) {
               const line = narrate(block.id, block.name, block.input);
-              setInsights((prev) => [...prev, line]);
+              // Collapse consecutive identical tool calls into one line with a running count.
+              setInsights((prev) => {
+                const last = prev[prev.length - 1];
+                if (last && last.toolName === line.toolName && last.text === line.text) {
+                  return [...prev.slice(0, -1), { ...last, count: (last.count ?? 1) + 1 }];
+                }
+                return [...prev, line];
+              });
             }
           }
           if (text) {
@@ -216,6 +230,12 @@ export function App(props: AppProps): React.JSX.Element {
           // estimate now that the real number has landed.
           setSessionCostUsd(msg.total_cost_usd);
           setTurnUsage({});
+          // contextWindow is the active model's ceiling; usage is this turn's total against it — kept between turns, not reset.
+          const usage = (modelRef.current && msg.modelUsage[modelRef.current]) || Object.values(msg.modelUsage)[0];
+          if (usage && usage.contextWindow > 0) {
+            const used = msg.usage.input_tokens + msg.usage.output_tokens + msg.usage.cache_read_input_tokens + msg.usage.cache_creation_input_tokens;
+            setContextUsage({ used, window: usage.contextWindow });
+          }
           if (msg.is_error) {
             const detail = msg.subtype === 'success' ? 'the turn ended in an error' : (msg.errors[0] ?? msg.subtype);
             setEntries((prev) => [...prev, { id: `result-${msg.uuid}`, role: 'system', text: `⚠ ${redact(detail)}` }]);
@@ -335,6 +355,10 @@ export function App(props: AppProps): React.JSX.Element {
     setInsights([]);
     setSessionCostUsd(undefined);
     setTurnUsage({});
+    setContextUsage(undefined);
+    sentHistoryRef.current = [];
+    historyIndexRef.current = null;
+    stashedDraftRef.current = '';
     setStatus('idle');
     setEntries([{ id: `resume-${sessionId}`, role: 'system', text: `resuming session ${sessionId.slice(0, 8)}…` }]);
     // Swap in a fresh SdkSession (via the useMemo above) before the await
@@ -389,12 +413,45 @@ export function App(props: AppProps): React.JSX.Element {
     }
     if (key.pageDown) {
       setScrollOffset((offset) => Math.max(0, offset - SCROLL_STEP));
+      return;
+    }
+    // Only while PromptInput owns the bottom slot; Up/Down are otherwise unbound.
+    if (key.upArrow && !current && !historyOpen) {
+      const history = sentHistoryRef.current;
+      if (history.length === 0) return;
+      if (historyIndexRef.current === null) {
+        historyIndexRef.current = history.length - 1;
+        const index = historyIndexRef.current;
+        setDraft((prev) => {
+          stashedDraftRef.current = prev;
+          return history[index] ?? '';
+        });
+      } else if (historyIndexRef.current > 0) {
+        historyIndexRef.current -= 1;
+        setDraft(history[historyIndexRef.current] ?? '');
+      } else {
+        setDraft(history[historyIndexRef.current] ?? '');
+      }
+      return;
+    }
+    if (key.downArrow && !current && !historyOpen) {
+      if (historyIndexRef.current === null) return;
+      if (historyIndexRef.current < sentHistoryRef.current.length - 1) {
+        historyIndexRef.current += 1;
+        setDraft(sentHistoryRef.current[historyIndexRef.current] ?? '');
+      } else {
+        historyIndexRef.current = null;
+        setDraft(stashedDraftRef.current);
+      }
     }
   });
 
   const handleSubmit = (text: string): void => {
     msgCounterRef.current += 1;
     setEntries((prev) => [...prev, { id: `user-${msgCounterRef.current}`, role: 'user', text }]);
+    sentHistoryRef.current.push(text);
+    historyIndexRef.current = null;
+    stashedDraftRef.current = '';
     setScrollOffset(0);
     // Claude Code's slash commands (/mcp, /agents, /hooks, etc.) are handled
     // by the real CLI's own REPL before a message is ever sent — nocap has no
@@ -420,6 +477,7 @@ export function App(props: AppProps): React.JSX.Element {
   // the next result lands. Undefined (no $ shown) until there's anything to show.
   const runningEstimateUsd = status === 'running' ? estimateCost(turnUsage, model) : 0;
   const costUsd = sessionCostUsd !== undefined || runningEstimateUsd > 0 ? (sessionCostUsd ?? 0) + runningEstimateUsd : undefined;
+  const contextPercent = contextUsage ? Math.min(100, Math.round((contextUsage.used / contextUsage.window) * 100)) : undefined;
 
   const bottom = current ? (
     <ApprovalCard
@@ -431,7 +489,16 @@ export function App(props: AppProps): React.JSX.Element {
   ) : historyOpen ? (
     <HistoryBrowser sessions={sessions} onSelect={(id) => runFireAndForget(() => handleResumeSession(id))} onClose={() => setHistoryOpen(false)} />
   ) : (
-    <PromptInput isActive value={draft} onChange={setDraft} onSubmit={handleSubmit} />
+    <PromptInput
+      isActive
+      value={draft}
+      onChange={(updater) => {
+        // Editing the draft exits recall mode, like a shell.
+        historyIndexRef.current = null;
+        setDraft(updater);
+      }}
+      onSubmit={handleSubmit}
+    />
   );
 
   return (
@@ -444,6 +511,7 @@ export function App(props: AppProps): React.JSX.Element {
       elapsedMs={tick}
       costUsd={costUsd}
       status={status}
+      contextPercent={contextPercent}
       scrollOffset={scrollOffset}
       bottom={bottom}
     />

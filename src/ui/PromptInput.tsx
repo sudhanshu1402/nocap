@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Text, useInput, usePaste } from 'ink';
-import { colors } from './theme.js';
+import { colors, ruleBorder } from './theme.js';
 
 interface Props {
   isActive: boolean;
@@ -56,7 +56,7 @@ export function PromptInput({ isActive, value, onChange, onSubmit, placeholder =
   const isEmpty = value.length === 0;
 
   return (
-    <Box borderStyle="single" borderColor={colors.border} paddingX={1}>
+    <Box {...ruleBorder('top')} paddingX={1}>
       {isEmpty ? (
         <Text color={colors.dim} dimColor>
           {placeholder}

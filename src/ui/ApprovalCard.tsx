@@ -28,8 +28,8 @@ export function ApprovalCard({ request, queuedCount, onApprove, onDeny }: Props)
 
   return (
     <Box flexDirection="column" borderStyle="round" borderColor={colors.risk[request.risk.level]} paddingX={1}>
-      <Text bold>
-        approval needed{queuedCount > 0 ? `  (+${queuedCount} waiting)` : ''}
+      <Text bold color={colors.risk[request.risk.level]}>
+        ✎ approval needed{queuedCount > 0 ? `  (+${queuedCount} waiting)` : ''}
       </Text>
       <Text>{headline}</Text>
       {subtitle && (

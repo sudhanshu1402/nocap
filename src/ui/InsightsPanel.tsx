@@ -13,7 +13,7 @@ export function InsightsPanel({ lines, maxVisible }: Props): React.JSX.Element {
 
   return (
     <Box flexDirection="column" flexGrow={1}>
-      <Text bold underline>
+      <Text bold color={colors.accent}>
         insights
       </Text>
       {visible.length === 0 && (
@@ -23,7 +23,7 @@ export function InsightsPanel({ lines, maxVisible }: Props): React.JSX.Element {
       )}
       {visible.map((line, index) => (
         <Text key={`${line.id}-${index}`} color={colors.risk[line.risk]}>
-          • {line.text}
+          › {line.text}
         </Text>
       ))}
     </Box>

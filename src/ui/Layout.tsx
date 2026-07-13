@@ -3,13 +3,13 @@ import { Box, useWindowSize } from 'ink';
 import { Transcript } from './Transcript.js';
 import { InsightsPanel } from './InsightsPanel.js';
 import { StatusBar } from './StatusBar.js';
-import { colors } from './theme.js';
+import { ruleBorder } from './theme.js';
 import type { ChatEntry, SessionStatus } from './types.js';
 import type { InsightLine } from '../narrator/narrate.js';
 import type { PermissionMode } from '../sdk/types.js';
 
 const WIDE_BREAKPOINT = 100;
-const RESERVED_ROWS = 6; // status bar + docked input/card + borders/margins
+const RESERVED_ROWS = 4; // status bar (1 border + 1 content) + docked input (1 border + 1 content)
 
 interface Props {
   entries: ChatEntry[];
@@ -51,14 +51,14 @@ export function Layout(props: Props): React.JSX.Element {
           <Box flexGrow={1} flexBasis="70%" marginRight={1}>
             {transcript}
           </Box>
-          <Box flexBasis="30%" borderStyle="single" borderColor={colors.border} paddingX={1}>
+          <Box flexBasis="30%" {...ruleBorder('left')} paddingX={1}>
             {insights}
           </Box>
         </Box>
       ) : (
         <Box flexDirection="column" flexGrow={1}>
           {transcript}
-          <Box borderStyle="single" borderColor={colors.border} paddingX={1}>
+          <Box {...ruleBorder('top')} paddingX={1}>
             {insights}
           </Box>
         </Box>

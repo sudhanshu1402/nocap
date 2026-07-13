@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Text } from 'ink';
-import { colors } from './theme.js';
+import { colors, ruleBorder } from './theme.js';
 import type { PermissionMode } from '../sdk/types.js';
 import type { SessionStatus } from './types.js';
 
@@ -28,19 +28,38 @@ function formatElapsed(ms: number): string {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
+const DIVIDER = '   │   ';
+
 export function StatusBar({ model, permissionMode, elapsedMs, costUsd, status }: Props): React.JSX.Element {
   return (
-    <Box borderStyle="single" borderColor={colors.border} paddingX={1} justifyContent="space-between">
+    <Box {...ruleBorder('top')} paddingX={1} justifyContent="space-between">
       <Text>
-        <Text color={colors.accent}>{model}</Text>
-        {'  ·  '}
-        {MODE_LABEL[permissionMode]}
+        <Text color={colors.accent} bold>
+          {model}
+        </Text>
+        <Text color={colors.border}>{DIVIDER}</Text>
+        <Text color={colors.dim}>{MODE_LABEL[permissionMode]}</Text>
       </Text>
       <Text>
-        {status === 'running' ? '● working   ' : ''}
-        {status === 'error' ? '⚠ error   ' : ''}
-        {typeof costUsd === 'number' ? `$${costUsd.toFixed(2)}   ` : ''}
-        {formatElapsed(elapsedMs)}
+        {status === 'running' && (
+          <Text color={colors.accent}>
+            ● working
+            <Text color={colors.border}>{DIVIDER}</Text>
+          </Text>
+        )}
+        {status === 'error' && (
+          <Text color={colors.danger}>
+            ⚠ error
+            <Text color={colors.border}>{DIVIDER}</Text>
+          </Text>
+        )}
+        {typeof costUsd === 'number' && (
+          <Text color={colors.dim}>
+            {`$${costUsd.toFixed(2)}`}
+            <Text color={colors.border}>{DIVIDER}</Text>
+          </Text>
+        )}
+        <Text color={colors.dim}>{formatElapsed(elapsedMs)}</Text>
       </Text>
     </Box>
   );

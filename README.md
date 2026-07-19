@@ -2,6 +2,11 @@
 
 **no cap, no jargon — just tells you what it's actually doing.**
 
+[![CI](https://github.com/sudhanshu1402/nocap/actions/workflows/ci.yml/badge.svg)](https://github.com/sudhanshu1402/nocap/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/%40sudhanshu1402%2Fnocap.svg?color=CB3837&logo=npm)](https://www.npmjs.com/package/@sudhanshu1402/nocap)
+[![node](https://img.shields.io/badge/node-%E2%89%A522-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 nocap is a plain-English terminal app for [Claude Code](https://claude.com/claude-code). It's
 the same real Claude Code underneath — real filesystem access, hooks, MCP servers, skills,
 subagents, the same permission system — but instead of raw tool-call JSON and diffs, you get a
@@ -79,7 +84,7 @@ the wizard only runs in an interactive terminal.
 ## Contributing
 
 ```
-git clone <repo-url>
+git clone https://github.com/sudhanshu1402/nocap.git
 cd nocap
 npm install
 npm run dev          # run against the real SDK (needs ANTHROPIC_API_KEY)

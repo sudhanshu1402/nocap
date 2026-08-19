@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="180" viewBox="0 0 1200 180" role="img" aria-label="nocap: a plain-English terminal UI for Claude Code. on npm, Ink, Claude Agent SDK, node >= 22. The failure it exists for: raw tool-call JSON, then a blind yes. readable feed, and a card before risky.">
+  <title>nocap</title>
+  <style>
+    .m { font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace; }
+    .n { font-size: 34px; font-weight: 700; fill: #8250df; }
+    .t { font-size: 15px; fill: #656d76; }
+    .s { font-size: 12px; fill: #656d76; }
+    .l { font-size: 11px; fill: #656d76; letter-spacing: 2.5px; }
+    .f { font-size: 13px; fill: #1f2328; }
+    .ul { fill: #8250df; transform-origin: 56px 0; animation: ul .7s cubic-bezier(.2,.8,.2,1) .15s both; }
+    @keyframes ul { from { transform: scaleX(0) } to { transform: scaleX(1) } }
+    @media (prefers-reduced-motion: reduce) {
+      .ul { animation: none }
+    }
+  </style>
+  <defs>
+    <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#eaeef2" />
+    </pattern>
+  </defs>
+  <rect x="0.5" y="0.5" width="1199" height="179" rx="14" fill="#ffffff" stroke="#d0d7de" />
+  <rect x="1" y="1" width="1198" height="178" rx="14" fill="url(#dots)" />
+  <text class="m n" x="56" y="72">nocap</text>
+  <rect class="ul" x="56" y="86" width="94" height="3" rx="1.5" />
+  <text class="m t" x="56" y="118">a plain-English terminal UI for Claude Code</text>
+  <text class="m s" x="56" y="148">on npm  .  Ink  .  Claude Agent SDK  .  node >= 22</text>
+  <g>
+    <rect x="700.5" y="36.5" width="443" height="107" rx="8" fill="none" stroke="#d0d7de" />
+    <text class="m l" x="724" y="64">THE FAILURE IT EXISTS FOR</text>
+    <text class="m f" x="724" y="94">raw tool-call JSON, then a blind yes.</text>
+    <text class="m f" x="724" y="116">readable feed, and a card before risky.</text>
+  </g>
+</svg>

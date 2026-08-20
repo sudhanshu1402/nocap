@@ -21,7 +21,7 @@ A plain-English terminal app for [Claude Code](https://claude.com/claude-code). 
 npx @sudhanshu1402/nocap
 ```
 
-First run walks you through a short wizard: your Anthropic API key (pasted once, optionally saved with permissions locked to your user), a default model, how approvals work, and whether to send anonymous telemetry (off unless you opt in). Then type what you want done, like you would to a person.
+First run walks you through a short wizard: your Anthropic API key (pasted once, optionally saved with permissions locked to your user), a default model, and how approvals work. nocap sends no telemetry and has no analytics; the only network call it makes is to the Anthropic API. Then type what you want done, like you would to a person.
 
 Install permanently with `npm install -g @sudhanshu1402/nocap`. Needs Node 22+.
 

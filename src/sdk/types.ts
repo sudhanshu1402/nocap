@@ -60,6 +60,10 @@ export function isTextBlock(block: { type: string }): block is TextBlock {
   return block.type === 'text';
 }
 
+// `input` is model- or MCP-controlled and can arrive null, so narrowing on
+// `type` alone would hand the UI a broken object it then dereferences.
 export function isToolUseBlock(block: { type: string }): block is ToolUseBlock {
-  return block.type === 'tool_use';
+  if (block.type !== 'tool_use') return false;
+  const input = (block as { input?: unknown }).input;
+  return typeof input === 'object' && input !== null && !Array.isArray(input);
 }

@@ -28,8 +28,8 @@ describe('readConfig', () => {
   });
 
   it('round-trips a config written by writeConfig', () => {
-    writeConfig({ apiKey: 'sk-ant-test123', model: 'claude-sonnet-5', telemetryOptIn: true }, path);
-    expect(readConfig(path)).toEqual({ apiKey: 'sk-ant-test123', model: 'claude-sonnet-5', telemetryOptIn: true });
+    writeConfig({ apiKey: 'sk-ant-test123', model: 'claude-sonnet-5' }, path);
+    expect(readConfig(path)).toEqual({ apiKey: 'sk-ant-test123', model: 'claude-sonnet-5' });
   });
 });
 

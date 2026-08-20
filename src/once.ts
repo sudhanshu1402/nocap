@@ -12,6 +12,12 @@ export interface RunOnceConfig {
   cwd?: string;
   resume?: string; // set by --continue/--resume so --once can also target a past session
   queryFn?: QueryFn; // injectable for tests
+  /**
+   * Give up if no result message arrives. Headless mode is meant for scripts
+   * and CI, where a stalled query would otherwise hang the job forever.
+   * Defaults to 5 minutes; 0 waits indefinitely.
+   */
+  timeoutMs?: number;
 }
 
 export interface RunOnceResult {
@@ -35,19 +41,35 @@ const headlessCanUseTool: CanUseTool = async (toolName, input) => {
   };
 };
 
+const DEFAULT_TIMEOUT_MS = 300_000;
+
 export async function runOnce(prompt: string, config: RunOnceConfig): Promise<RunOnceResult> {
   const session = new SdkSession(config.queryFn);
 
+  const timeoutMs = config.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+
   return new Promise<RunOnceResult>((resolve, reject) => {
     let settled = false;
+    let timer: NodeJS.Timeout | undefined;
 
-    const finish = (result: RunOnceResult): void => {
-      if (settled) return;
+    const teardown = (): void => {
       settled = true;
+      if (timer) clearTimeout(timer);
       unsubMessage();
       unsubError();
       session.close();
+    };
+
+    const finish = (result: RunOnceResult): void => {
+      if (settled) return;
+      teardown();
       resolve(result);
+    };
+
+    const fail = (err: unknown): void => {
+      if (settled) return;
+      teardown();
+      reject(err instanceof Error ? err : new Error(String(err)));
     };
 
     const unsubMessage = session.onMessage((msg) => {
@@ -68,13 +90,14 @@ export async function runOnce(prompt: string, config: RunOnceConfig): Promise<Ru
       }
     });
 
-    const unsubError = session.onError((err) => {
-      if (settled) return;
-      settled = true;
-      unsubMessage();
-      session.close();
-      reject(err instanceof Error ? err : new Error(String(err)));
-    });
+    const unsubError = session.onError((err) => fail(err));
+
+    if (timeoutMs > 0) {
+      timer = setTimeout(
+        () => fail(new Error(`nocap --once timed out after ${timeoutMs}ms with no result from the model`)),
+        timeoutMs,
+      );
+    }
 
     session.start(
       buildOptions({

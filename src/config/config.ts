@@ -7,7 +7,6 @@ export const CONFIG_PATH = join(homedir(), '.nocap', 'config.json');
 export interface NocapConfig {
   apiKey?: string;
   model?: string;
-  telemetryOptIn?: boolean;
 }
 
 /** Returns {} on any read/parse failure — no config file yet is the normal first-run case. */

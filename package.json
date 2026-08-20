@@ -28,7 +28,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json && chmod +x dist/cli.js",
     "dev": "tsx src/cli.tsx",
-    "lint": "eslint src test",
+    "lint": "eslint src test --max-warnings 0",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

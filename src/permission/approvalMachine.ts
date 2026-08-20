@@ -44,10 +44,22 @@ export class ApprovalMachine {
 
   request(req: ApprovalRequest, signal?: AbortSignal): Promise<PermissionResult> {
     return new Promise((resolve) => {
+      // A toolUseID we are already holding means the caller re-requested it.
+      // Overwriting the settler would leave the first canUseTool promise pending
+      // forever, so deny it and let the new request take the slot.
+      const previous = this.settlers.get(req.id);
+      if (previous) {
+        previous({ behavior: 'deny', message: 'superseded by a newer request for the same tool use' });
+      }
+
+      let onAbort: (() => void) | undefined;
       const settle: Settle = (result) => {
         if (!this.settlers.has(req.id)) return; // already settled
         this.settlers.delete(req.id);
         this.queue = this.queue.filter((r) => r.id !== req.id);
+        // A long-lived turn signal would otherwise accumulate one listener per
+        // approval and keep every settled request's closure alive.
+        if (onAbort) signal?.removeEventListener('abort', onAbort);
         this.emit();
         resolve(result);
       };
@@ -60,11 +72,9 @@ export class ApprovalMachine {
           settle({ behavior: 'deny', message: 'cancelled — turn was interrupted' });
           return;
         }
-        signal.addEventListener(
-          'abort',
-          () => settle({ behavior: 'deny', message: 'cancelled — turn was interrupted' }),
-          { once: true },
-        );
+        onAbort = (): void =>
+          settle({ behavior: 'deny', message: 'cancelled — turn was interrupted' });
+        signal.addEventListener('abort', onAbort, { once: true });
       }
     });
   }

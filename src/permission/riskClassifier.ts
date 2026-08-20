@@ -13,7 +13,10 @@ interface BashRule {
   saferAlternative?: string;
 }
 
-// Order matters: first match wins, most dangerous first.
+// Highest matching level wins, not first match. `sudo npm publish` matches both
+// the medium sudo rule and the high publish rule, and first-match ordering gave
+// the more dangerous command the softer card. Within one level, first wins, so
+// the order below is still most-dangerous-first for readability.
 const BASH_RULES: BashRule[] = [
   {
     // Lookaheads so recursive (-r) and force (-f) are caught whether combined
@@ -56,6 +59,16 @@ const BASH_RULES: BashRule[] = [
     reason: 'can destroy data on a disk',
   },
   {
+    pattern: /\bnpm\s+publish\b|\byarn\s+publish\b|\bpnpm\s+publish\b/,
+    level: 'high',
+    reason: 'publishes a package publicly — hard to fully undo',
+  },
+  {
+    pattern: /\bcurl\b.*\|\s*(sh|bash)\b|\bwget\b.*\|\s*(sh|bash)\b/,
+    level: 'high',
+    reason: 'downloads and runs a script from the internet',
+  },
+  {
     pattern: /\brm\b/,
     level: 'medium',
     reason: 'deletes one or more files',
@@ -70,25 +83,18 @@ const BASH_RULES: BashRule[] = [
     level: 'medium',
     reason: 'runs with elevated system privileges',
   },
-  {
-    pattern: /\bnpm\s+publish\b|\byarn\s+publish\b|\bpnpm\s+publish\b/,
-    level: 'high',
-    reason: 'publishes a package publicly — hard to fully undo',
-  },
-  {
-    pattern: /\bcurl\b.*\|\s*(sh|bash)\b|\bwget\b.*\|\s*(sh|bash)\b/,
-    level: 'high',
-    reason: 'downloads and runs a script from the internet',
-  },
 ];
 
+const LEVEL_RANK: Record<RiskLevel, number> = { low: 0, medium: 1, high: 2 };
+
 function classifyBash(command: string): RiskAssessment {
+  let worst: BashRule | undefined;
   for (const rule of BASH_RULES) {
-    if (rule.pattern.test(command)) {
-      return { level: rule.level, reason: rule.reason, saferAlternative: rule.saferAlternative };
-    }
+    if (!rule.pattern.test(command)) continue;
+    if (!worst || LEVEL_RANK[rule.level] > LEVEL_RANK[worst.level]) worst = rule;
   }
-  return { level: 'medium', reason: 'runs a command on your computer' };
+  if (!worst) return { level: 'medium', reason: 'runs a command on your computer' };
+  return { level: worst.level, reason: worst.reason, saferAlternative: worst.saferAlternative };
 }
 
 const TOOL_RISK: Record<string, RiskAssessment> = {

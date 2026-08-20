@@ -122,3 +122,43 @@ describe('narrate', () => {
     expect(line.text).toBe('running: rm -rf ./dist');
   });
 });
+
+// README.md promises secrets are never displayed. These pin the two paths that
+// render the least predictable strings: the no-template fallback, and long
+// values where truncating before redacting would leak the tail.
+describe('narration never leaks a secret-shaped string', () => {
+  const KEY = 'sk-ant-api03-AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHH';
+
+  it('redacts in the fallback used for unknown and mcp__ tools', () => {
+    for (const toolName of ['SomeFutureTool', 'mcp__vault__read']) {
+      const line = fallbackLine(toolName, { command: `export TOKEN=${KEY}` });
+      expect(line).not.toContain('sk-ant-api03');
+      expect(line).toContain('[redacted]');
+    }
+  });
+
+  it('redacts before truncating, so a cut cannot free the tail', () => {
+    for (const [tool, field] of [
+      ['Bash', 'command'],
+      ['Grep', 'pattern'],
+      ['Glob', 'pattern'],
+      ['WebFetch', 'url'],
+      ['WebSearch', 'query'],
+    ] as const) {
+      const line = lookupTemplate(tool)?.({ [field]: `${KEY} ${'x'.repeat(200)}` }) ?? '';
+      expect(line, tool).not.toContain('sk-ant-api03');
+    }
+  });
+
+  it('keeps every insight line short enough for the two-pane layout', () => {
+    const long = 'y'.repeat(500);
+    for (const [tool, field] of [
+      ['Glob', 'pattern'],
+      ['Task', 'description'],
+      ['WebSearch', 'query'],
+    ] as const) {
+      const line = lookupTemplate(tool)?.({ [field]: long }) ?? '';
+      expect(line.length, tool).toBeLessThan(120);
+    }
+  });
+});

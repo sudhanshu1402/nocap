@@ -151,6 +151,39 @@ describe('ApprovalMachine', () => {
     expect(machine.pendingCount).toBe(0);
   });
 
+  // The settler map is keyed by toolUseID. A second request under the same id
+  // used to overwrite the first settler, leaving that canUseTool promise pending
+  // for the rest of the session.
+  it('denies a superseded request instead of orphaning it', async () => {
+    const machine = new ApprovalMachine();
+    const first = machine.request(makeRequest('a'));
+    const second = machine.request(makeRequest('a', { toolName: 'Bash' }));
+
+    await expect(first).resolves.toEqual({
+      behavior: 'deny',
+      message: 'superseded by a newer request for the same tool use',
+    });
+    expect(machine.pendingCount).toBe(1);
+    expect(machine.current?.toolName).toBe('Bash');
+
+    machine.deny('a');
+    await expect(second).resolves.toMatchObject({ behavior: 'deny' });
+  });
+
+  // One turn signal serves every approval in that turn, so a listener left
+  // behind per settled request accumulates for the whole turn.
+  it('removes its abort listener once the request settles', async () => {
+    const machine = new ApprovalMachine();
+    const controller = new AbortController();
+    const remove = vi.spyOn(controller.signal, 'removeEventListener');
+
+    const promise = machine.request(makeRequest('a'), controller.signal);
+    machine.approve('a');
+    await promise;
+
+    expect(remove).toHaveBeenCalledWith('abort', expect.any(Function));
+  });
+
   it('onChange() unsubscribe stops further notifications', () => {
     const machine = new ApprovalMachine();
     const onChange = vi.fn();

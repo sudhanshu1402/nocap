@@ -47,7 +47,15 @@ export class SdkSession {
     if (!this.queryHandle) return;
     try {
       for await (const msg of this.queryHandle) {
-        for (const listener of this.messageListeners) listener(msg);
+        // A listener that throws must not abandon the iterator — doing that
+        // deadens the session with no way back. Report it and keep consuming.
+        for (const listener of this.messageListeners) {
+          try {
+            listener(msg);
+          } catch (err) {
+            for (const errListener of this.errorListeners) errListener(err);
+          }
+        }
       }
     } catch (err) {
       for (const listener of this.errorListeners) listener(err);

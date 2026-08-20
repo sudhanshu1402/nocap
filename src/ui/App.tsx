@@ -107,7 +107,12 @@ export function App(props: AppProps): React.JSX.Element {
   const gitSnapshotRef = useRef<Array<{ hash: string; createdAt: number }>>([]);
   const resumeIdRef = useRef<string | undefined>(props.resumeSessionId);
   const modelRef = useRef<string | undefined>(undefined); // mirrors `model` state without the effect's stale closure
-  // Refs, not state — driven only via the setDraft() they trigger.
+  // The live draft. Ink can fire several input events from one stdin chunk
+  // before React re-renders, so `draft` state is stale inside a burst; anything
+  // that needs the current text (Enter, history stash) reads this ref, and
+  // `draft` only mirrors it for rendering.
+  const draftRef = useRef('');
+  // Refs, not state — driven only via the applyDraft() they trigger.
   const sentHistoryRef = useRef<string[]>([]);
   const historyIndexRef = useRef<number | null>(null); // null = live draft, not recalling
   const stashedDraftRef = useRef('');
@@ -382,6 +387,13 @@ export function App(props: AppProps): React.JSX.Element {
     });
   };
 
+  // Single writer for the draft: update the ref first (synchronous, so a burst
+  // of input events each see the previous one), then mirror it into state.
+  const applyDraft = (next: string | ((prev: string) => string)): void => {
+    draftRef.current = typeof next === 'function' ? next(draftRef.current) : next;
+    setDraft(draftRef.current);
+  };
+
   useInput((input, key) => {
     if (key.ctrl && input === 'c') {
       session.close();
@@ -422,15 +434,15 @@ export function App(props: AppProps): React.JSX.Element {
       if (historyIndexRef.current === null) {
         historyIndexRef.current = history.length - 1;
         const index = historyIndexRef.current;
-        setDraft((prev) => {
+        applyDraft((prev) => {
           stashedDraftRef.current = prev;
           return history[index] ?? '';
         });
       } else if (historyIndexRef.current > 0) {
         historyIndexRef.current -= 1;
-        setDraft(history[historyIndexRef.current] ?? '');
+        applyDraft(history[historyIndexRef.current] ?? '');
       } else {
-        setDraft(history[historyIndexRef.current] ?? '');
+        applyDraft(history[historyIndexRef.current] ?? '');
       }
       return;
     }
@@ -438,15 +450,21 @@ export function App(props: AppProps): React.JSX.Element {
       if (historyIndexRef.current === null) return;
       if (historyIndexRef.current < sentHistoryRef.current.length - 1) {
         historyIndexRef.current += 1;
-        setDraft(sentHistoryRef.current[historyIndexRef.current] ?? '');
+        applyDraft(sentHistoryRef.current[historyIndexRef.current] ?? '');
       } else {
         historyIndexRef.current = null;
-        setDraft(stashedDraftRef.current);
+        applyDraft(stashedDraftRef.current);
       }
     }
   });
 
-  const handleSubmit = (text: string): void => {
+  const handleSubmit = (): void => {
+    // Read the live draft, not the `draft` prop PromptInput rendered with: a
+    // key-repeat burst can land several characters before React re-renders, and
+    // submitting the stale value would drop the tail of what was typed.
+    const text = draftRef.current.trim();
+    if (!text) return;
+    applyDraft('');
     msgCounterRef.current += 1;
     setEntries((prev) => [...prev, { id: `user-${msgCounterRef.current}`, role: 'user', text }]);
     sentHistoryRef.current.push(text);
@@ -495,7 +513,7 @@ export function App(props: AppProps): React.JSX.Element {
       onChange={(updater) => {
         // Editing the draft exits recall mode, like a shell.
         historyIndexRef.current = null;
-        setDraft(updater);
+        applyDraft(updater);
       }}
       onSubmit={handleSubmit}
     />

@@ -10,7 +10,6 @@ export interface WizardResult {
   apiKey: string;
   model: string;
   saveLocally: boolean;
-  telemetryOptIn: boolean;
 }
 
 interface Props {
@@ -18,11 +17,11 @@ interface Props {
   testApiKeyFn?: TestApiKeyFn;
 }
 
-type Step = 'apiKey' | 'testing' | 'saveChoice' | 'model' | 'permission' | 'telemetry';
+type Step = 'apiKey' | 'testing' | 'saveChoice' | 'model' | 'permission';
 
 /**
- * First-run wizard. Only step 3 (permission default) has no interactive
- * choice — it's a static explanation. There is no yolo/bypass toggle in
+ * First-run wizard. The last step (permission default) has no interactive
+ * choice — it's a static explanation, and enter finishes setup. There is no yolo/bypass toggle in
  * this wizard at all; "ask before risky actions" is the only mode nocap
  * ever starts in, so there's nothing to weaken here.
  */
@@ -82,16 +81,9 @@ export function Wizard({ onComplete, testApiKeyFn = defaultTestApiKey }: Props):
     }
 
     if (step === 'permission') {
-      if (key.return) setStep('telemetry');
-      return;
-    }
-
-    if (step === 'telemetry') {
-      const model = MODEL_CHOICES[modelIndex]?.id ?? MODEL_CHOICES[0]!.id;
-      if (input === 'y') {
-        onComplete({ apiKey: apiKey.trim(), model, saveLocally, telemetryOptIn: true });
-      } else if (input === 'n' || key.return) {
-        onComplete({ apiKey: apiKey.trim(), model, saveLocally, telemetryOptIn: false });
+      if (key.return) {
+        const model = MODEL_CHOICES[modelIndex]?.id ?? MODEL_CHOICES[0]!.id;
+        onComplete({ apiKey: apiKey.trim(), model, saveLocally });
       }
     }
   });
@@ -148,16 +140,7 @@ export function Wizard({ onComplete, testApiKeyFn = defaultTestApiKey }: Props):
               there is no bypass/yolo mode in this setup.
             </Text>
             <Text color={colors.dim} dimColor>
-              [enter] continue
-            </Text>
-          </Box>
-        )}
-
-        {step === 'telemetry' && (
-          <Box flexDirection="column">
-            <Text>send anonymous usage telemetry? (default: off)</Text>
-            <Text color={colors.dim} dimColor>
-              [y] enable · [n] / [enter] keep it off
+              [enter] finish
             </Text>
           </Box>
         )}

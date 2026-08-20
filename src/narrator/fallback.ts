@@ -1,4 +1,5 @@
 import { truncate } from '../util/format.js';
+import { redact } from '../util/redact.js';
 
 const SUMMARY_FIELDS = ['file_path', 'path', 'command', 'query', 'url', 'pattern', 'prompt', 'notebook_path'];
 
@@ -19,10 +20,12 @@ function humanizeToolName(toolName: string): string {
   return humanizeWords(toolName);
 }
 
+// Redact before truncating. This path renders input for tools with no template,
+// including every mcp__* call, so it is the least predictable string in the UI.
 function pickSummaryField(input: Record<string, unknown>): string | undefined {
   for (const field of SUMMARY_FIELDS) {
     const value = input[field];
-    if (typeof value === 'string' && value.length > 0) return truncate(value, 50);
+    if (typeof value === 'string' && value.length > 0) return truncate(redact(value), 50);
   }
   return undefined;
 }

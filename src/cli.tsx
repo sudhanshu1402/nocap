@@ -97,7 +97,7 @@ async function main(): Promise<void> {
     apiKey = result.apiKey;
     model = result.model;
     if (result.saveLocally) {
-      writeConfig({ ...readConfig(), apiKey: result.apiKey, model: result.model, telemetryOptIn: result.telemetryOptIn });
+      writeConfig({ ...readConfig(), apiKey: result.apiKey, model: result.model });
     }
   }
 

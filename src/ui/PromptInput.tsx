@@ -6,7 +6,7 @@ interface Props {
   isActive: boolean;
   value: string;
   onChange: (updater: (prev: string) => string) => void;
-  onSubmit: (text: string) => void;
+  onSubmit: () => void;
   placeholder?: string;
 }
 
@@ -22,17 +22,15 @@ interface Props {
  * (e.g. a held-backspace key-repeat burst) before React re-renders, so
  * handlers here must never compute the next value from the `value` prop —
  * that prop is frozen at last render and stale-value writes collapse to the
- * last one, silently dropping the rest of the burst.
+ * last one, silently dropping the rest of the burst. For the same reason
+ * onSubmit takes no text: the parent holds the live draft and reads it there,
+ * rather than this component submitting the value it last rendered with.
  */
 export function PromptInput({ isActive, value, onChange, onSubmit, placeholder = 'message claude…' }: Props): React.JSX.Element {
   useInput(
     (input, key) => {
       if (key.return) {
-        const text = value.trim();
-        if (text) {
-          onSubmit(text);
-          onChange(() => '');
-        }
+        onSubmit();
         return;
       }
       if (key.ctrl && input === 'j') {

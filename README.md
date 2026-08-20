@@ -1,4 +1,10 @@
-# nocap
+<h1>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sudhanshu1402/nocap/main/assets/banner-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/sudhanshu1402/nocap/main/assets/banner-light.svg" />
+  <img src="https://raw.githubusercontent.com/sudhanshu1402/nocap/main/assets/banner-dark.svg" width="100%" alt="nocap: a plain-English terminal UI for Claude Code. on npm, Ink, Claude Agent SDK, node >= 22. The failure it exists for: raw tool-call JSON, then a blind yes. readable feed, and a card before risky." />
+</picture>
+</h1>
 
 **no cap, no jargon, just tells you what it's actually doing.**
 

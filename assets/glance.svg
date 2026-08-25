@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="150" viewBox="0 0 880 150" role="img" aria-label="nocap at a glance: plain English instead of tool-call JSON, narration generated locally for zero tokens, an approval card before anything risky, real Claude Code underneath with your hooks, MCP servers and skills">
+  <rect width="880" height="150" rx="10" fill="#0d1117" stroke="#30363d"/>
+  <g font-family="ui-monospace,SFMono-Regular,Menlo,monospace">
+    <rect x="20" y="30" width="195" height="96" rx="8" fill="#161b22" stroke="#30363d"/>
+    <text x="34" y="56" fill="#7d8590" font-size="11" letter-spacing="1">WHAT</text>
+    <text x="34" y="82" fill="#58a6ff" font-size="15" font-weight="600">plain English</text>
+    <text x="34" y="106" fill="#7d8590" font-size="11">not tool-call JSON</text>
+    <rect x="235" y="30" width="195" height="96" rx="8" fill="#161b22" stroke="#30363d"/>
+    <text x="249" y="56" fill="#7d8590" font-size="11" letter-spacing="1">NARRATION</text>
+    <text x="249" y="82" fill="#3fb950" font-size="15" font-weight="600">zero tokens</text>
+    <text x="249" y="106" fill="#7d8590" font-size="11">generated on your machine</text>
+    <rect x="450" y="30" width="195" height="96" rx="8" fill="#161b22" stroke="#30363d"/>
+    <text x="464" y="56" fill="#7d8590" font-size="11" letter-spacing="1">APPROVAL</text>
+    <text x="464" y="82" fill="#d29922" font-size="15" font-weight="600">card first</text>
+    <text x="464" y="106" fill="#7d8590" font-size="11">never says yes for you</text>
+    <rect x="665" y="30" width="195" height="96" rx="8" fill="#161b22" stroke="#30363d"/>
+    <text x="679" y="56" fill="#7d8590" font-size="11" letter-spacing="1">UNDERNEATH</text>
+    <text x="679" y="82" fill="#e6edf3" font-size="15" font-weight="600">real Claude Code</text>
+    <text x="679" y="106" fill="#7d8590" font-size="11">your hooks, MCP, skills</text>
+  </g>
+</svg>

@@ -13,7 +13,13 @@
 [![node](https://img.shields.io/badge/node-%E2%89%A522-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+![nocap at a glance: plain English instead of tool-call JSON, narration generated locally for zero tokens, an approval card before anything risky, real Claude Code underneath with your hooks, MCP servers and skills](https://raw.githubusercontent.com/sudhanshu1402/nocap/main/assets/glance.svg)
+
 A plain-English terminal app for [Claude Code](https://claude.com/claude-code). Real Claude Code underneath, with your actual filesystem access, hooks, MCP servers, skills, subagents, and permission system. The difference is what you see: a readable feed of what Claude is doing instead of raw tool-call JSON, and a clear Yes/No card before anything risky.
+
+![The Insights pane: reading src/auth/session.ts, searching for verifyToken in src, editing src/auth/session.ts, run the auth tests, delegating to code-reviewer, create issue via linear, running rm -rf build dist flagged high risk](https://raw.githubusercontent.com/sudhanshu1402/nocap/main/assets/insights.svg)
+
+Those lines are what `narrate()` returns for real tool-call payloads, generated on your machine by string templates. No second model call, no extra tokens.
 
 ## Start
 
@@ -52,6 +58,10 @@ One non-interactive turn, no UI. Needs `ANTHROPIC_API_KEY` in the environment or
 
 ## Safety
 
+![Approval card for rm -rf build dist: high risk, deletes files permanently and cannot be undone, nocap asks whether to move the files to trash instead, with y for yes, n for no, a for always allow](https://raw.githubusercontent.com/sudhanshu1402/nocap/main/assets/approval.svg)
+
+The risk level, the reason and the safer alternative in that card are what `classifyRisk()` returns for `rm -rf build dist`; the classifier reads the command, not a keyword list, so `-r -f` split across two flags is caught the same way.
+
 Every risky or irreversible action goes through an approval card, and that isn't a toggle the wizard can turn off. API keys and secrets are never logged or displayed, including in crash output. nocap is a UI layer, not a sandboxed subset, so your real hooks, MCP servers, skills, and permission modes all still apply.
 
 ## Contributing
@@ -61,6 +71,7 @@ git clone https://github.com/sudhanshu1402/nocap.git
 cd nocap && npm install
 npm run dev
 npm run lint && npm run typecheck && npm test && npm run build
+npm run assets   # regenerates the two captured images above from src/
 ```
 
 Inputs are built directly on Ink's `useInput` and `usePaste`. No `ink-text-input` or other third-party Ink input components, to avoid version drift.

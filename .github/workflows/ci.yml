@@ -21,6 +21,8 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - name: README diagrams are current
+        run: npm run assets && git add -A -N assets/ && git diff --exit-code assets/
 
   # Publishes only when package.json's version doesn't match what's already
   # on npm — so pushing to main is safe by default and only ships a release

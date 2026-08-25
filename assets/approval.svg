@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="577" height="196" viewBox="0 0 577 196" role="img" aria-label="Approval card for rm -rf build dist: high risk, deletes files permanently — this cannot be undone, move the files to trash instead?">
+  <rect width="577" height="196" rx="10" fill="#0d1117" stroke="#30363d"/>
+  <path d="M0 10a10 10 0 0 1 10-10h557a10 10 0 0 1 10 10v28H0z" fill="#161b22"/>
+  <circle cx="20" cy="19" r="6" fill="#ff5f57"/><circle cx="38" cy="19" r="6" fill="#febc2e"/><circle cx="56" cy="19" r="6" fill="#28c840"/>
+  <text x="72" y="23" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" fill="#7d8590">Approval card, high risk</text>
+  <g font-family="ui-monospace,SFMono-Regular,Menlo,monospace">
+    <text x="24" y="72" fill="#7d8590" font-size="12">command     </text>
+    <text x="125" y="72" fill="#e6edf3" font-size="13">rm -rf build dist</text>
+    <text x="24" y="96" fill="#7d8590" font-size="12">risk        </text>
+    <text x="125" y="96" fill="#f85149" font-size="13">high: deletes files permanently — this cannot be undone</text>
+    <text x="24" y="120" fill="#7d8590" font-size="12">nocap asks  </text>
+    <text x="125" y="120" fill="#58a6ff" font-size="13">move the files to trash instead?</text>
+    <text x="24" y="178" fill="#c9d1d9" font-size="13">[y] yes   [n] no   [a] always allow this tool this session</text>
+  </g>
+</svg>

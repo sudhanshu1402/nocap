@@ -26,6 +26,7 @@
     "node": ">=22"
   },
   "scripts": {
+    "assets": "tsx scripts/make-readme-svg.mts",
     "build": "tsc -p tsconfig.build.json && chmod +x dist/cli.js",
     "dev": "tsx src/cli.tsx",
     "lint": "eslint src test --max-warnings 0",

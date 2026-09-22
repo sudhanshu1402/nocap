@@ -1,7 +1,7 @@
 import type { CanUseTool, Options, PermissionMode } from './types.js';
 
 /**
- * Tools that never touch the filesystem/network destructively — auto-allowed
+ * Tools that never touch the filesystem/network destructively - auto-allowed
  * so approval cards only appear for genuinely consequential actions. Never
  * put a write/execute/delete-capable tool in this list.
  */
@@ -36,7 +36,7 @@ export function buildOptions(config: SessionConfig): Options {
   return {
     systemPrompt: { type: 'preset', preset: 'claude_code' },
     tools: { type: 'preset', preset: 'claude_code' },
-    // Loads the user's real hooks, MCP servers, skills, and CLAUDE.md — this
+    // Loads the user's real hooks, MCP servers, skills, and CLAUDE.md - this
     // is a UI layer over real Claude Code, never a sandboxed subset.
     settingSources: ['user', 'project', 'local'],
     permissionMode: config.permissionMode ?? 'default',
@@ -47,10 +47,10 @@ export function buildOptions(config: SessionConfig): Options {
     extraArgs: { 'replay-user-messages': null },
     cwd: config.cwd ?? process.cwd(),
     resume: config.resume,
-    // `env` REPLACES process.env wholesale (per SDK docs) — spread it or the
+    // `env` REPLACES process.env wholesale (per SDK docs) - spread it or the
     // subprocess loses PATH/HOME/nvm-managed node and silently misbehaves.
     // No apiKey means the user is relying on an existing `claude` CLI login
-    // (see config/claudeAuth.ts) — leave env untouched so the SDK's own
+    // (see config/claudeAuth.ts) - leave env untouched so the SDK's own
     // subprocess resolves that auth itself instead of us forcing a key.
     env: config.apiKey ? { ...process.env, ANTHROPIC_API_KEY: config.apiKey } : process.env,
     stderr: config.onStderr,

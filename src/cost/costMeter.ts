@@ -14,7 +14,7 @@ export interface ModelPricing {
 
 /**
  * Approximate per-family pricing, USD per million tokens. Used ONLY to
- * smooth the live in-turn $ estimate between `result` messages — the
+ * smooth the live in-turn $ estimate between `result` messages - the
  * authoritative number is always the SDK's `result.total_cost_usd`, which
  * replaces this estimate the moment a turn finishes. Verify against
  * https://claude.com/pricing before trusting this table for anything else.
@@ -33,7 +33,7 @@ function resolvePricing(model: string, pricing: Record<string, ModelPricing>): M
 
 /**
  * Pure $ estimate for a chunk of token usage against a model's pricing.
- * Returns 0 (never throws, never guesses) when the model isn't recognized —
+ * Returns 0 (never throws, never guesses) when the model isn't recognized -
  * an unpriced live estimate should read as "no estimate yet", not a wrong number.
  */
 export function estimateCost(

@@ -35,7 +35,7 @@ const DIVIDER = '   │   ';
 
 export function StatusBar({ model, permissionMode, elapsedMs, costUsd, status, contextPercent }: Props): React.JSX.Element {
   const [spinnerFrame, setSpinnerFrame] = useState(0);
-  // Ticks only while a turn is in flight — fast enough to read as motion, unlike the 1s elapsed clock.
+  // Ticks only while a turn is in flight - fast enough to read as motion, unlike the 1s elapsed clock.
   useEffect(() => {
     if (status !== 'running') return;
     const id = setInterval(() => setSpinnerFrame((frame) => frame + 1), 100);

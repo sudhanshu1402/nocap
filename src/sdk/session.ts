@@ -47,7 +47,7 @@ export class SdkSession {
     if (!this.queryHandle) return;
     try {
       for await (const msg of this.queryHandle) {
-        // A listener that throws must not abandon the iterator — doing that
+        // A listener that throws must not abandon the iterator - doing that
         // deadens the session with no way back. Report it and keep consuming.
         for (const listener of this.messageListeners) {
           try {
@@ -85,7 +85,7 @@ export class SdkSession {
   }
 
   // Signals no further turns are coming without tearing down the in-flight
-  // query — unlike close(), the current response is still allowed to arrive.
+  // query - unlike close(), the current response is still allowed to arrive.
   endInput(): void {
     this.inputQueue.close();
   }

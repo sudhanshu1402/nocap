@@ -4,12 +4,12 @@ import type { SDKSessionInfo, SessionMessage } from '../sdk/types.js';
 export interface ListRecentSessionsOptions {
   cwd?: string;
   limit?: number;
-  /** Injectable for tests — defaults to the real SDK's listSessions(). */
+  /** Injectable for tests - defaults to the real SDK's listSessions(). */
   listSessionsFn?: typeof sdkListSessions;
 }
 
 /**
- * Sessions for this project, most-recently-modified first — the natural
+ * Sessions for this project, most-recently-modified first - the natural
  * order for a Ctrl+H history picker. listSessions() itself doesn't document
  * a guaranteed order, so this sorts defensively rather than trusting it.
  */

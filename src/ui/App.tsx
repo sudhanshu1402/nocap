@@ -35,7 +35,7 @@ function textFromStoredMessage(message: unknown): string {
 }
 
 // Session-store messages are persisted with `message: unknown` (sdk/types.ts
-// — the on-disk shape isn't guaranteed) — extract just enough text to
+// - the on-disk shape isn't guaranteed) - extract just enough text to
 // repaint the transcript after a resume.
 function sessionMessagesToEntries(messages: SessionMessage[]): ChatEntry[] {
   const entries: ChatEntry[] = [];
@@ -50,7 +50,7 @@ function sessionMessagesToEntries(messages: SessionMessage[]): ChatEntry[] {
 
 type SetEntries = React.Dispatch<React.SetStateAction<ChatEntry[]>>;
 
-// Shared by the launch-time resume effect and Ctrl+H's handleResumeSession —
+// Shared by the launch-time resume effect and Ctrl+H's handleResumeSession -
 // `isStale` lets a caller abandon its own result once a newer resume has
 // superseded it (see resumeGenerationRef in App).
 async function loadPastTranscript(sessionId: string, cwd: string, setEntries: SetEntries, isStale: () => boolean): Promise<void> {
@@ -75,8 +75,8 @@ export interface AppProps {
   model?: string;
   cwd?: string;
   resumeSessionId?: string; // set by --continue/--resume to resume on launch
-  resumeNotice?: string; // e.g. "no past session found" — shown in-transcript since stderr is hidden once the alt-screen takes over
-  queryFn?: QueryFn; // injectable for tests — omit to use the real SDK
+  resumeNotice?: string; // e.g. "no past session found" - shown in-transcript since stderr is hidden once the alt-screen takes over
+  queryFn?: QueryFn; // injectable for tests - omit to use the real SDK
   onEntriesChange?: (entries: ChatEntry[]) => void;
 }
 
@@ -112,11 +112,11 @@ export function App(props: AppProps): React.JSX.Element {
   // that needs the current text (Enter, history stash) reads this ref, and
   // `draft` only mirrors it for rendering.
   const draftRef = useRef('');
-  // Refs, not state — driven only via the applyDraft() they trigger.
+  // Refs, not state - driven only via the applyDraft() they trigger.
   const sentHistoryRef = useRef<string[]>([]);
   const historyIndexRef = useRef<number | null>(null); // null = live draft, not recalling
   const stashedDraftRef = useRef('');
-  // Bumped by both the launch-time resume effect and handleResumeSession —
+  // Bumped by both the launch-time resume effect and handleResumeSession -
   // whichever load started last wins; an earlier in-flight load checks this
   // before applying its result and discards itself if it's been superseded.
   const resumeGenerationRef = useRef(0);
@@ -140,7 +140,7 @@ export function App(props: AppProps): React.JSX.Element {
 
   // Launched with --continue/--resume: preload the past transcript so the
   // resumed conversation is visible right away, same as picking one from
-  // Ctrl+H. Mount-only — resumeSessionId is a launch-time value that never
+  // Ctrl+H. Mount-only - resumeSessionId is a launch-time value that never
   // changes for the life of the process. Shares resumeGenerationRef with
   // handleResumeSession so a Ctrl+H resume that lands first wins and this
   // load's result is discarded instead of appending stale/duplicate entries.
@@ -182,7 +182,7 @@ export function App(props: AppProps): React.JSX.Element {
           } else if (msg.subtype === 'permission_denied') {
             setEntries((prev) => [
               ...prev,
-              { id: `denied-${msg.uuid}`, role: 'system', text: `blocked: ${msg.tool_name} — ${redact(msg.message)}` },
+              { id: `denied-${msg.uuid}`, role: 'system', text: `blocked: ${msg.tool_name} - ${redact(msg.message)}` },
             ]);
           }
           break;
@@ -193,7 +193,7 @@ export function App(props: AppProps): React.JSX.Element {
             const chunk = event.delta.text;
             setStreamingText((text) => text + redact(chunk));
           } else if (event.type === 'message_delta') {
-            // Cumulative usage-so-far for this turn — feeds the live $ estimate
+            // Cumulative usage-so-far for this turn - feeds the live $ estimate
             // in the status bar until the authoritative result.total_cost_usd lands.
             const { usage } = event;
             setTurnUsage({
@@ -231,11 +231,11 @@ export function App(props: AppProps): React.JSX.Element {
         case 'result': {
           setStatus(msg.is_error ? 'error' : 'idle');
           // total_cost_usd is already the session-to-date total, not a
-          // per-turn delta — replace, never sum, and clear the in-turn
+          // per-turn delta - replace, never sum, and clear the in-turn
           // estimate now that the real number has landed.
           setSessionCostUsd(msg.total_cost_usd);
           setTurnUsage({});
-          // contextWindow is the active model's ceiling; usage is this turn's total against it — kept between turns, not reset.
+          // contextWindow is the active model's ceiling; usage is this turn's total against it - kept between turns, not reset.
           const usage = (modelRef.current && msg.modelUsage[modelRef.current]) || Object.values(msg.modelUsage)[0];
           if (usage && usage.contextWindow > 0) {
             const used = msg.usage.input_tokens + msg.usage.output_tokens + msg.usage.cache_read_input_tokens + msg.usage.cache_creation_input_tokens;
@@ -248,8 +248,8 @@ export function App(props: AppProps): React.JSX.Element {
           break;
         }
         case 'user': {
-          // isReplay (not just uuid) distinguishes a genuine turn replay —
-          // from extraArgs' 'replay-user-messages' — from other 'user' messages.
+          // isReplay (not just uuid) distinguishes a genuine turn replay -
+          // from extraArgs' 'replay-user-messages' - from other 'user' messages.
           if ('isReplay' in msg) {
             checkpointTurnRef.current += 1;
             checkpointsRef.current.record(msg.uuid, `turn ${checkpointTurnRef.current}`);
@@ -286,14 +286,14 @@ export function App(props: AppProps): React.JSX.Element {
       session.close();
     };
     // Deliberately excludes props.apiKey/model/cwd/approvalMachine: the
-    // session restarts only when `session` itself changes identity — either
+    // session restarts only when `session` itself changes identity - either
     // once at mount, or when handleResumeSession bumps sessionEpoch.
   }, [session]);
 
   // Ctrl+Z: primarily rewinds Write/Edit/NotebookEdit changes via the SDK's
   // native per-turn checkpoint; falls back to the last git safety snapshot
   // (see checkpoint/checkpoints.ts) only when there's no SDK checkpoint left
-  // to step back to — e.g. a turn that only ran Bash.
+  // to step back to - e.g. a turn that only ran Bash.
   const handleUndo = async (): Promise<void> => {
     const target = checkpointsRef.current.undoTarget();
     let rewindError: string | undefined;
@@ -307,12 +307,12 @@ export function App(props: AppProps): React.JSX.Element {
           {
             id: `undo-${target.id}`,
             role: 'system',
-            text: `undone: ${target.label} — ${pluralize(filesChanged, 'file')} restored (+${result.insertions ?? 0}/-${result.deletions ?? 0})`,
+            text: `undone: ${target.label} - ${pluralize(filesChanged, 'file')} restored (+${result.insertions ?? 0}/-${result.deletions ?? 0})`,
           },
         ]);
         return;
       }
-      // SDK rewind had nothing to do (e.g. a Bash-only turn) — fall through
+      // SDK rewind had nothing to do (e.g. a Bash-only turn) - fall through
       // to the git snapshot fallback instead of stopping here.
       rewindError = result?.error ?? 'nothing to rewind';
     }
@@ -320,7 +320,7 @@ export function App(props: AppProps): React.JSX.Element {
     if (snapshot) {
       const restored = await restoreGitSnapshot(cwd, snapshot.hash);
       if (restored) {
-        // Only consume the snapshot once it's actually been applied — a
+        // Only consume the snapshot once it's actually been applied - a
         // failed restore leaves it in place so a retry has something to undo.
         gitSnapshotRef.current = gitSnapshotRef.current.slice(0, -1);
       }
@@ -367,7 +367,7 @@ export function App(props: AppProps): React.JSX.Element {
     setStatus('idle');
     setEntries([{ id: `resume-${sessionId}`, role: 'system', text: `resuming session ${sessionId.slice(0, 8)}…` }]);
     // Swap in a fresh SdkSession (via the useMemo above) before the await
-    // below, not after — otherwise the old session stays fully subscribed
+    // below, not after - otherwise the old session stays fully subscribed
     // for the whole transcript-load duration, and any message it receives
     // in that window lands on the freshly-reset state above.
     setSessionEpoch((epoch) => epoch + 1);
@@ -472,7 +472,7 @@ export function App(props: AppProps): React.JSX.Element {
     stashedDraftRef.current = '';
     setScrollOffset(0);
     // Claude Code's slash commands (/mcp, /agents, /hooks, etc.) are handled
-    // by the real CLI's own REPL before a message is ever sent — nocap has no
+    // by the real CLI's own REPL before a message is ever sent - nocap has no
     // equivalent, so forwarding "/foo" would just confuse the model instead
     // of doing anything. Say so plainly instead of sending it silently.
     if (isSlashCommand(text)) {
@@ -481,7 +481,7 @@ export function App(props: AppProps): React.JSX.Element {
         {
           id: `slash-${msgCounterRef.current}`,
           role: 'system',
-          text: "slash commands aren't supported in nocap yet — ask in plain English instead, or run `claude` directly for that command.",
+          text: "slash commands aren't supported in nocap yet - ask in plain English instead, or run `claude` directly for that command.",
         },
       ]);
       return;
@@ -491,7 +491,7 @@ export function App(props: AppProps): React.JSX.Element {
   };
 
   // Confirmed session total (from the last result) plus a live local
-  // estimate for the turn in flight, if any — replaced wholesale the moment
+  // estimate for the turn in flight, if any - replaced wholesale the moment
   // the next result lands. Undefined (no $ shown) until there's anything to show.
   const runningEstimateUsd = status === 'running' ? estimateCost(turnUsage, model) : 0;
   const costUsd = sessionCostUsd !== undefined || runningEstimateUsd > 0 ? (sessionCostUsd ?? 0) + runningEstimateUsd : undefined;

@@ -122,7 +122,7 @@ function createHarness(): Harness {
       switch (msg.type) {
         case 'system': {
           if (msg.subtype === 'permission_denied') {
-            harness.transcript.push(`blocked: ${msg.tool_name} — ${redact(msg.message)}`);
+            harness.transcript.push(`blocked: ${msg.tool_name} - ${redact(msg.message)}`);
           }
           break;
         }
@@ -172,7 +172,7 @@ describe('full session round-trip against a mock SDK', () => {
           content: 'hello',
         });
         // The real SDK calls canUseTool internally once it reaches a tool
-        // that needs a permission decision — the mock does the same so this
+        // that needs a permission decision - the mock does the same so this
         // test exercises the real ApprovalMachine + canUseTool bridge.
         const decision = await options!.canUseTool!(
           'Write',
@@ -249,7 +249,7 @@ describe('full session round-trip against a mock SDK', () => {
             subtype: 'permission_denied',
             tool_name: 'Bash',
             tool_use_id: 'toolu_bash_1',
-            message: `denied — leaked sk-ant-api03-abcdefgh12345678 in the reason`,
+            message: `denied - leaked sk-ant-api03-abcdefgh12345678 in the reason`,
             uuid: randomUUID(),
             session_id: sessionId,
           } as unknown as SDKMessage;
@@ -270,7 +270,7 @@ describe('full session round-trip against a mock SDK', () => {
     machine.deny('toolu_bash_1');
     await new Promise((resolve) => setTimeout(resolve, 10));
 
-    expect(harness.transcript).toEqual(['blocked: Bash — denied — leaked [redacted] in the reason']);
+    expect(harness.transcript).toEqual(['blocked: Bash - denied - leaked [redacted] in the reason']);
     session.close();
   });
 

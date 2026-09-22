@@ -26,7 +26,7 @@ const BASH_RULES: BashRule[] = [
     // statement.
     pattern: /\brm\b(?=[^|;&\n]*(?:^|\s)-[a-z-]*r)(?=[^|;&\n]*(?:^|\s)-[a-z-]*f)/i,
     level: 'high',
-    reason: 'deletes files permanently — this cannot be undone',
+    reason: 'deletes files permanently - this cannot be undone',
     saferAlternative: 'move the files to trash instead?',
   },
   {
@@ -61,7 +61,7 @@ const BASH_RULES: BashRule[] = [
   {
     pattern: /\bnpm\s+publish\b|\byarn\s+publish\b|\bpnpm\s+publish\b/,
     level: 'high',
-    reason: 'publishes a package publicly — hard to fully undo',
+    reason: 'publishes a package publicly - hard to fully undo',
   },
   {
     pattern: /\bcurl\b.*\|\s*(sh|bash)\b|\bwget\b.*\|\s*(sh|bash)\b/,

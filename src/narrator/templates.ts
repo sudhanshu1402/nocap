@@ -12,14 +12,14 @@ function num(v: unknown): number {
 }
 
 // Redact first, then truncate. The other order can cut a secret in half and let
-// the tail slip past the pattern — same reasoning as src/ui/ApprovalCard.tsx.
+// the tail slip past the pattern - same reasoning as src/ui/ApprovalCard.tsx.
 function safe(v: unknown, max: number): string {
   return truncate(redact(str(v)), max);
 }
 
 /**
  * Local, zero-token plain-English line per known tool. Every function here
- * must be pure and synchronous — no LLM calls, ever (narration is free).
+ * must be pure and synchronous - no LLM calls, ever (narration is free).
  */
 const TEMPLATES: Record<string, Template> = {
   Read: (input) => `reading ${shortenPath(str(input.file_path))}`,

@@ -41,7 +41,7 @@ describe('writeConfig', () => {
 
   it('chmods the file 600, including when overwriting a pre-existing file', () => {
     writeConfig({ apiKey: 'first' }, path);
-    writeConfig({ apiKey: 'second' }, path); // overwrite path — writeFileSync's mode option alone won't reapply here
+    writeConfig({ apiKey: 'second' }, path); // overwrite path - writeFileSync's mode option alone won't reapply here
     const mode = statSync(path).mode & 0o777;
     expect(mode).toBe(0o600);
     expect(readConfig(path)).toEqual({ apiKey: 'second' });

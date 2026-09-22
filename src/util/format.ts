@@ -1,4 +1,4 @@
-// True when filePath is dir itself or a proper descendant of it — checks the
+// True when filePath is dir itself or a proper descendant of it - checks the
 // boundary character instead of appending '/' so a root dir ("/") doesn't
 // need special-casing to avoid a doubled "//" prefix.
 function isUnderDir(filePath: string, dir: string): boolean {
@@ -29,7 +29,7 @@ export function pluralize(count: number, noun: string): string {
   return `${count} ${noun}${count === 1 ? '' : 's'}`;
 }
 
-// A real slash command's first token is a bare word ("mcp", "figma:use") —
+// A real slash command's first token is a bare word ("mcp", "figma:use") -
 // file paths always carry a second '/' or a '.' extension in that same
 // token, so this narrows the match instead of flagging every leading slash.
 export function isSlashCommand(text: string): boolean {

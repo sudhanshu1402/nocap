@@ -28,7 +28,7 @@ export interface RunOnceResult {
  * Headless single-turn mode (`nocap --once "<prompt>"`) for scripting and
  * automated verification without a live terminal. There is no UI to show an
  * approval card, so anything beyond the read-only allowlist is auto-denied
- * — never auto-approved, even here — and reported to stderr with the reason.
+ * - never auto-approved, even here - and reported to stderr with the reason.
  */
 const headlessCanUseTool: CanUseTool = async (toolName, input) => {
   if (isAutoAllowedReadOnly(toolName)) {
@@ -37,7 +37,7 @@ const headlessCanUseTool: CanUseTool = async (toolName, input) => {
   const risk = classifyRisk(toolName, input);
   return {
     behavior: 'deny',
-    message: `headless mode (--once) never approves actions automatically — rerun "nocap" interactively to allow "${toolName}" (${risk.reason})`,
+    message: `headless mode (--once) never approves actions automatically - rerun "nocap" interactively to allow "${toolName}" (${risk.reason})`,
   };
 };
 
@@ -83,7 +83,7 @@ export async function runOnce(prompt: string, config: RunOnceConfig): Promise<Ru
           }
         }
       } else if (msg.type === 'system' && msg.subtype === 'permission_denied') {
-        process.stderr.write(`· blocked: ${msg.tool_name} — ${redact(msg.message)}\n`);
+        process.stderr.write(`· blocked: ${msg.tool_name} - ${redact(msg.message)}\n`);
       } else if (msg.type === 'result') {
         process.stdout.write('\n');
         finish({ ok: !msg.is_error });

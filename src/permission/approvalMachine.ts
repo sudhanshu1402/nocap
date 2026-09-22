@@ -69,11 +69,11 @@ export class ApprovalMachine {
 
       if (signal) {
         if (signal.aborted) {
-          settle({ behavior: 'deny', message: 'cancelled — turn was interrupted' });
+          settle({ behavior: 'deny', message: 'cancelled - turn was interrupted' });
           return;
         }
         onAbort = (): void =>
-          settle({ behavior: 'deny', message: 'cancelled — turn was interrupted' });
+          settle({ behavior: 'deny', message: 'cancelled - turn was interrupted' });
         signal.addEventListener('abort', onAbort, { once: true });
       }
     });

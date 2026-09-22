@@ -132,7 +132,7 @@ describe('ApprovalMachine', () => {
 
     await expect(promise).resolves.toEqual({
       behavior: 'deny',
-      message: 'cancelled — turn was interrupted',
+      message: 'cancelled - turn was interrupted',
     });
     expect(machine.pendingCount).toBe(0);
   });
@@ -146,7 +146,7 @@ describe('ApprovalMachine', () => {
 
     await expect(promise).resolves.toEqual({
       behavior: 'deny',
-      message: 'cancelled — turn was interrupted',
+      message: 'cancelled - turn was interrupted',
     });
     expect(machine.pendingCount).toBe(0);
   });

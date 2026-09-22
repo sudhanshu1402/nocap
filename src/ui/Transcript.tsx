@@ -30,7 +30,7 @@ export function Transcript({ entries, streamingText, maxVisible, scrollOffset }:
     <Box flexDirection="column" flexGrow={1}>
       {hiddenAbove > 0 && (
         <Text color={colors.dim} dimColor>
-          ↑ {hiddenAbove} earlier message{hiddenAbove === 1 ? '' : 's'} — PgUp to scroll
+          ↑ {hiddenAbove} earlier message{hiddenAbove === 1 ? '' : 's'} - PgUp to scroll
         </Text>
       )}
       {visible.length === 0 && (

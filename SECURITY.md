@@ -25,7 +25,7 @@
 
  That opens a private advisory visible only to you and the maintainer.
 
- If private reporting is unavailable to you, open an issue that says only that you have a security report and asks for a private channel — no details, no proof of concept.
+ If private reporting is unavailable to you, open an issue that says only that you have a security report and asks for a private channel - no details, no proof of concept.
 
  ## What to expect
 
@@ -42,4 +42,4 @@
  - Vulnerabilities in dependencies that have no exploitable path through this project. Report those upstream; Dependabot already tracks dependency advisories here.
  - Findings that require an attacker to already control the machine, the process, or the terminal session.
  - Automated scanner output with no demonstrated impact.
- 
+

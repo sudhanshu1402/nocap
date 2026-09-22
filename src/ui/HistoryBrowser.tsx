@@ -22,7 +22,7 @@ export function relativeTime(ms: number): string {
 
 /**
  * Ctrl+H session picker. Owns up/down/Enter/Esc while mounted, same pattern
- * as ApprovalCard — the parent conditionally mounts this in place of the
+ * as ApprovalCard - the parent conditionally mounts this in place of the
  * PromptInput, so it's the only thing capturing input.
  */
 export function HistoryBrowser({ sessions, onSelect, onClose }: Props): React.JSX.Element {
@@ -54,7 +54,7 @@ export function HistoryBrowser({ sessions, onSelect, onClose }: Props): React.JS
         return (
           <Text key={session.sessionId} color={selected ? colors.accent : undefined} inverse={selected}>
             {selected ? '› ' : '  '}
-            {truncate(title, 70)} — {relativeTime(session.lastModified)}
+            {truncate(title, 70)} - {relativeTime(session.lastModified)}
           </Text>
         );
       })}

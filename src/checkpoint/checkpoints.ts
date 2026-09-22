@@ -4,7 +4,7 @@ import { promisify } from 'node:util';
 const execFileAsync = promisify(execFile);
 
 export interface Checkpoint {
-  id: string; // SDKUserMessage uuid — the userMessageId argument rewindFiles() expects
+  id: string; // SDKUserMessage uuid - the userMessageId argument rewindFiles() expects
   label: string;
   createdAt: number;
 }
@@ -54,12 +54,12 @@ export async function isGitRepo(cwd: string, exec: Exec = defaultExec): Promise<
 }
 
 /**
- * SDK checkpointing only tracks Write/Edit/NotebookEdit — this is the
+ * SDK checkpointing only tracks Write/Edit/NotebookEdit - this is the
  * fallback for Bash-caused changes. `git stash create` records a commit-ish
  * snapshot of the working tree WITHOUT touching the index, working tree, or
  * branch history (unlike `git stash push`), so it's safe to call before a
  * risky Bash command runs. Returns undefined (never throws) when cwd isn't
- * a git repo, the tree is clean, or git itself fails — a failed snapshot
+ * a git repo, the tree is clean, or git itself fails - a failed snapshot
  * must never block the tool call it's protecting.
  */
 export async function snapshotGit(cwd: string, exec: Exec = defaultExec): Promise<string | undefined> {

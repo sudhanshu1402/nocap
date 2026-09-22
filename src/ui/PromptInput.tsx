@@ -11,7 +11,7 @@ interface Props {
 }
 
 /**
- * Small controlled text box on Ink's native useInput/usePaste — no
+ * Small controlled text box on Ink's native useInput/usePaste - no
  * ink-text-input dependency (avoids version drift against the freshly
  * released Ink 7). MVP-scoped: append/backspace only, no mid-string cursor
  * movement. Draft lives in the parent (not local state) so it survives this
@@ -20,7 +20,7 @@ interface Props {
  * onChange always takes a functional updater, never a computed value: Ink
  * can synchronously fire several input/paste events from one stdin chunk
  * (e.g. a held-backspace key-repeat burst) before React re-renders, so
- * handlers here must never compute the next value from the `value` prop —
+ * handlers here must never compute the next value from the `value` prop -
  * that prop is frozen at last render and stale-value writes collapse to the
  * last one, silently dropping the rest of the burst. For the same reason
  * onSubmit takes no text: the parent holds the live draft and reads it there,

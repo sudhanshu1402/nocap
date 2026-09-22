@@ -7,7 +7,7 @@ const defaultExec: ExecFn = (file, args) =>
 
 /**
  * True when `claude` CLI already has a valid login (subscription or its own
- * stored API key) — checked via its own `auth status` so nocap never demands
+ * stored API key) - checked via its own `auth status` so nocap never demands
  * a redundant key on a machine that's already authenticated. The Agent SDK
  * picks up that same auth automatically once nocap stops forcing
  * ANTHROPIC_API_KEY (see sdk/options.ts). Fails closed: claude not

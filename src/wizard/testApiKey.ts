@@ -2,7 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 
 export type TestApiKeyFn = (apiKey: string) => Promise<{ ok: boolean; message: string }>;
 
-/** Minimal live probe — 1 output token, cheapest model. Optional wizard step, never required. */
+/** Minimal live probe - 1 output token, cheapest model. Optional wizard step, never required. */
 export const testApiKey: TestApiKeyFn = async (apiKey) => {
   try {
     const client = new Anthropic({ apiKey });
@@ -13,7 +13,7 @@ export const testApiKey: TestApiKeyFn = async (apiKey) => {
     });
     return { ok: true, message: 'key looks valid' };
   } catch (err) {
-    // Only a genuine 401 means the key itself is bad — network errors, rate
+    // Only a genuine 401 means the key itself is bad - network errors, rate
     // limits, and overloaded-server responses aren't the key's fault and
     // shouldn't be reported as "rejected".
     if (err instanceof Anthropic.AuthenticationError) {

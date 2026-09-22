@@ -21,7 +21,7 @@ type Step = 'apiKey' | 'testing' | 'saveChoice' | 'model' | 'permission';
 
 /**
  * First-run wizard. The last step (permission default) has no interactive
- * choice — it's a static explanation, and enter finishes setup. There is no yolo/bypass toggle in
+ * choice - it's a static explanation, and enter finishes setup. There is no yolo/bypass toggle in
  * this wizard at all; "ask before risky actions" is the only mode nocap
  * ever starts in, so there's nothing to weaken here.
  */
@@ -93,7 +93,7 @@ export function Wizard({ onComplete, testApiKeyFn = defaultTestApiKey }: Props):
   return (
     <Box flexDirection="column" borderStyle="round" borderColor={colors.accent} padding={1} width={64}>
       <Text bold color={colors.accent}>
-        welcome to nocap — quick setup (~30s)
+        welcome to nocap - quick setup (~30s)
       </Text>
       <Box marginTop={1} flexDirection="column">
         {(step === 'apiKey' || step === 'testing') && (
@@ -101,7 +101,7 @@ export function Wizard({ onComplete, testApiKeyFn = defaultTestApiKey }: Props):
             <Text>paste your Anthropic API key, then press enter:</Text>
             <Text>{apiKey.length > 0 ? '•'.repeat(apiKey.length) : ''}▏</Text>
             {apiKey.trim().length > 0 && !looksLikeApiKey(apiKey) && (
-              <Text color={colors.risk.medium}>doesn&apos;t look like a typical Anthropic key (expected sk-ant-…) — enter still works</Text>
+              <Text color={colors.risk.medium}>doesn&apos;t look like a typical Anthropic key (expected sk-ant-…) - enter still works</Text>
             )}
             {step === 'testing' && <Text color={colors.dim}>testing key…</Text>}
             {testMessage && step === 'apiKey' && <Text color={testMessage.startsWith('key looks valid') ? colors.success : colors.danger}>{testMessage}</Text>}
@@ -126,7 +126,7 @@ export function Wizard({ onComplete, testApiKeyFn = defaultTestApiKey }: Props):
             {MODEL_CHOICES.map((m, i) => (
               <Text key={m.id} color={i === modelIndex ? colors.accent : undefined} inverse={i === modelIndex}>
                 {i === modelIndex ? '› ' : '  '}
-                {m.label} — {m.hint}
+                {m.label} - {m.hint}
               </Text>
             ))}
           </Box>
@@ -136,7 +136,7 @@ export function Wizard({ onComplete, testApiKeyFn = defaultTestApiKey }: Props):
           <Box flexDirection="column">
             <Text>permission mode: ask before risky actions</Text>
             <Text color={colors.dim} dimColor>
-              nocap always confirms before edits, deletes, and other risky actions — every session.
+              nocap always confirms before edits, deletes, and other risky actions - every session.
               there is no bypass/yolo mode in this setup.
             </Text>
             <Text color={colors.dim} dimColor>

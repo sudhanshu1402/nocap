@@ -3,7 +3,7 @@ import type { SDKUserMessage } from './types.js';
 /**
  * A pushable async iterable of SDKUserMessage. Feeding this as `prompt` to
  * query() keeps one continuous streaming-input session alive for the whole
- * app lifetime — full context, hooks, MCP, subagents, permissions intact.
+ * app lifetime - full context, hooks, MCP, subagents, permissions intact.
  */
 export class InputQueue implements AsyncIterable<SDKUserMessage> {
   private buffered: SDKUserMessage[] = [];

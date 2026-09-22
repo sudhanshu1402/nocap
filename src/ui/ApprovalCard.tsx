@@ -16,7 +16,7 @@ function str(v: unknown): string {
   return typeof v === 'string' ? v : '';
 }
 
-// Redact before truncate — truncating first can cut a secret mid-string and let the tail slip past the redact regex.
+// Redact before truncate - truncating first can cut a secret mid-string and let the tail slip past the redact regex.
 function formatPreview(toolName: string, input: Record<string, unknown>): string | undefined {
   switch (toolName) {
     case 'Bash': {
@@ -36,7 +36,7 @@ function formatPreview(toolName: string, input: Record<string, unknown>): string
     case 'MultiEdit': {
       const filePath = shortenPath(str(input.file_path));
       const edits = Array.isArray(input.edits) ? input.edits.length : 0;
-      return `${filePath} — ${pluralize(edits, 'edit')}`;
+      return `${filePath} - ${pluralize(edits, 'edit')}`;
     }
     default: {
       const summary = truncate(redact(JSON.stringify(input)), 150);
@@ -48,7 +48,7 @@ function formatPreview(toolName: string, input: Record<string, unknown>): string
 /**
  * Concise & neutral approval card. Renders only while a request is pending;
  * mounted conditionally by the parent, so it's the only thing capturing y/n/a
- * input — never auto-approves, never renders a decision on its own.
+ * input - never auto-approves, never renders a decision on its own.
  */
 export function ApprovalCard({ request, queuedCount, onApprove, onDeny }: Props): React.JSX.Element {
   useInput((input) => {

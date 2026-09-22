@@ -17,7 +17,7 @@ function printUsage(): void {
 
 interface ResumeResolution {
   sessionId?: string;
-  // Set instead of printing directly — cli.tsx runs console.error too early
+  // Set instead of printing directly - cli.tsx runs console.error too early
   // to be seen once Ink's alternateScreen takes over, so the caller surfaces
   // this in-transcript (App's resumeNotice prop) or, in --once mode, prints
   // it itself where stderr is still visible for the whole run.
@@ -25,7 +25,7 @@ interface ResumeResolution {
 }
 
 // Mirrors claude's own -c/--continue and -r/--resume [id] so a `claude` ->
-// `nocap` alias doesn't silently drop the flag — falls back to the most
+// `nocap` alias doesn't silently drop the flag - falls back to the most
 // recent session for this folder when no explicit id is given.
 async function resolveResumeSessionId(args: string[], cwd: string): Promise<ResumeResolution> {
   const equalsArg = args.find((a) => a.startsWith('--resume=') || a.startsWith('-r='));
@@ -46,11 +46,11 @@ async function resolveResumeSessionId(args: string[], cwd: string): Promise<Resu
   try {
     const [mostRecent] = await listRecentSessions({ cwd, limit: 1 });
     if (!mostRecent) {
-      return { notice: 'No past session found in this folder — starting fresh.' };
+      return { notice: 'No past session found in this folder - starting fresh.' };
     }
     return { sessionId: mostRecent.sessionId };
   } catch (err) {
-    return { notice: `couldn't read past sessions — starting fresh (${redact(err instanceof Error ? err.message : String(err))})` };
+    return { notice: `couldn't read past sessions - starting fresh (${redact(err instanceof Error ? err.message : String(err))})` };
   }
 }
 
@@ -84,7 +84,7 @@ async function main(): Promise<void> {
   const onceIndex = args.indexOf('--once');
 
   // No explicit key needed when `claude` is already logged in on this
-  // machine — the SDK's subprocess picks that auth up on its own as long as
+  // machine - the SDK's subprocess picks that auth up on its own as long as
   // we don't force ANTHROPIC_API_KEY (see sdk/options.ts).
   if (!apiKey && !hasClaudeCliAuth()) {
     if (onceIndex !== -1 || !process.stdin.isTTY) {

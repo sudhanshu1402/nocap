@@ -1,5 +1,5 @@
 // Scrubs secret-shaped substrings from any text before it's ever rendered,
-// logged, or written to a crash report. Defense in depth — the API key
+// logged, or written to a crash report. Defense in depth - the API key
 // itself never comes from model/tool output, but errors and echoed strings
 // might contain one (e.g. a misconfigured env var leaking into a message).
 const SECRET_PATTERNS: RegExp[] = [

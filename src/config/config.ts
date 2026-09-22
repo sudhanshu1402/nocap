@@ -9,7 +9,7 @@ export interface NocapConfig {
   model?: string;
 }
 
-/** Returns {} on any read/parse failure — no config file yet is the normal first-run case. */
+/** Returns {} on any read/parse failure - no config file yet is the normal first-run case. */
 export function readConfig(path: string = CONFIG_PATH): NocapConfig {
   try {
     const raw = readFileSync(path, 'utf8');
@@ -21,7 +21,7 @@ export function readConfig(path: string = CONFIG_PATH): NocapConfig {
 }
 
 /**
- * Writes the config file chmod 600 — it may hold an API key. writeFileSync's
+ * Writes the config file chmod 600 - it may hold an API key. writeFileSync's
  * `mode` option only applies when the file is newly created, so an explicit
  * chmodSync afterward guarantees the permission even when overwriting a file
  * that already existed with looser permissions.

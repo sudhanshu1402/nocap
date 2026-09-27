@@ -1,19 +1,12 @@
-<h1>
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sudhanshu1402/nocap/main/assets/banner-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/sudhanshu1402/nocap/main/assets/banner-light.svg" />
-  <img src="https://raw.githubusercontent.com/sudhanshu1402/nocap/main/assets/banner-dark.svg" width="100%" alt="nocap: a plain-English terminal UI for Claude Code. on npm, Ink, Claude Agent SDK, node >= 22. The failure it exists for: raw tool-call JSON, then a blind yes. readable feed, and a card before risky." />
-</picture>
-</h1>
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/sudhanshu1402/nocap/main/assets/hero.svg" width="100%" alt="nocap: NO CAP. It asks before rm -rf. A plain-English terminal UI for Claude Code. A high-risk approval card for rm -rf build dist offers to move the files to trash, with y, n and a keys. Narrated locally, zero extra tokens." />
+
+[![CI](https://github.com/sudhanshu1402/nocap/actions/workflows/ci.yml/badge.svg)](https://github.com/sudhanshu1402/nocap/actions/workflows/ci.yml) [![npm](https://img.shields.io/npm/v/%40sudhanshu1402%2Fnocap.svg?color=CB3837&logo=npm)](https://www.npmjs.com/package/@sudhanshu1402/nocap) [![node](https://img.shields.io/badge/node-%E2%89%A522-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+</div>
 
 **no cap, no jargon, just tells you what it's actually doing.**
-
-[![CI](https://github.com/sudhanshu1402/nocap/actions/workflows/ci.yml/badge.svg)](https://github.com/sudhanshu1402/nocap/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/%40sudhanshu1402%2Fnocap.svg?color=CB3837&logo=npm)](https://www.npmjs.com/package/@sudhanshu1402/nocap)
-[![node](https://img.shields.io/badge/node-%E2%89%A522-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-
-![nocap at a glance: plain English instead of tool-call JSON, narration generated locally for zero tokens, an approval card before anything risky, real Claude Code underneath with your hooks, MCP servers and skills](https://raw.githubusercontent.com/sudhanshu1402/nocap/main/assets/glance.svg)
 
 A plain-English terminal app for [Claude Code](https://claude.com/claude-code). Real Claude Code underneath, with your actual filesystem access, hooks, MCP servers, skills, subagents, and permission system. The difference is what you see: a readable feed of what Claude is doing instead of raw tool-call JSON, and a clear Yes/No card before anything risky.
 
@@ -75,6 +68,10 @@ npm run assets   # regenerates the two captured images above from src/
 ```
 
 Inputs are built directly on Ink's `useInput` and `usePaste`. No `ink-text-input` or other third-party Ink input components, to avoid version drift.
+
+---
+
+<sub>Part of [sudhanshu1402](https://github.com/sudhanshu1402)'s work: [keel](https://github.com/sudhanshu1402/keel) · **nocap** · [receipts](https://github.com/sudhanshu1402/receipts) · [enterprise-auth-stack](https://github.com/sudhanshu1402/enterprise-auth-stack) · [distributed-queue-engine](https://github.com/sudhanshu1402/distributed-queue-engine) · [multi-region-mongo-patterns](https://github.com/sudhanshu1402/multi-region-mongo-patterns) · [otel-sdk-node](https://github.com/sudhanshu1402/otel-sdk-node) · [llm-assessment-pipeline](https://github.com/sudhanshu1402/llm-assessment-pipeline). Write-ups on the [System Design Portal](https://sudhanshu1402.github.io/system-design-portal/).</sub>
 
 ## License
 
